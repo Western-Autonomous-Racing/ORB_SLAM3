@@ -269,8 +269,8 @@ Once ORB-SLAM3 has loaded the vocabulary, press space in the rosbag tab.
 
 ```bash
 source /opt/ros/foxy/setup.bash
-chmod +x build_ros.sh
-./build_ros.sh
+chmod +x build_ros2.sh
+./build_ros2.sh
 ```
 
 ### Running Mono-Interial
