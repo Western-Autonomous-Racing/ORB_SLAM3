@@ -1673,7 +1673,8 @@ void Tracking::PreintegrateIMU()
         if(bSleep)
             usleep(500);
     }
-
+    
+    cout << "mvImuFromLastFrame.size(): " << mvImuFromLastFrame.size() << endl;
     const int n = mvImuFromLastFrame.size()-1;
     if(n==0){
         cout << "Empty IMU measurements vector!!!\n";
@@ -1688,6 +1689,7 @@ void Tracking::PreintegrateIMU()
         Eigen::Vector3f acc, angVel;
         if((i==0) && (i<(n-1)))
         {
+            cout << "hello there" << endl;
             float tab = mvImuFromLastFrame[i+1].t-mvImuFromLastFrame[i].t;
             float tini = mvImuFromLastFrame[i].t-mCurrentFrame.mpPrevFrame->mTimeStamp;
             acc = (mvImuFromLastFrame[i].a+mvImuFromLastFrame[i+1].a-
@@ -1695,15 +1697,19 @@ void Tracking::PreintegrateIMU()
             angVel = (mvImuFromLastFrame[i].w+mvImuFromLastFrame[i+1].w-
                     (mvImuFromLastFrame[i+1].w-mvImuFromLastFrame[i].w)*(tini/tab))*0.5f;
             tstep = mvImuFromLastFrame[i+1].t-mCurrentFrame.mpPrevFrame->mTimeStamp;
+            cout << "tstep: " << tstep << endl;
         }
         else if(i<(n-1))
         {
+            cout << "hello there 2" << endl;
             acc = (mvImuFromLastFrame[i].a+mvImuFromLastFrame[i+1].a)*0.5f;
             angVel = (mvImuFromLastFrame[i].w+mvImuFromLastFrame[i+1].w)*0.5f;
             tstep = mvImuFromLastFrame[i+1].t-mvImuFromLastFrame[i].t;
+            cout << "tstep: " << tstep << endl;
         }
         else if((i>0) && (i==(n-1)))
         {
+            cout << "hello there 3" << endl;
             float tab = mvImuFromLastFrame[i+1].t-mvImuFromLastFrame[i].t;
             float tend = mvImuFromLastFrame[i+1].t-mCurrentFrame.mTimeStamp;
             acc = (mvImuFromLastFrame[i].a+mvImuFromLastFrame[i+1].a-
@@ -1711,12 +1717,15 @@ void Tracking::PreintegrateIMU()
             angVel = (mvImuFromLastFrame[i].w+mvImuFromLastFrame[i+1].w-
                     (mvImuFromLastFrame[i+1].w-mvImuFromLastFrame[i].w)*(tend/tab))*0.5f;
             tstep = mCurrentFrame.mTimeStamp-mvImuFromLastFrame[i].t;
+            cout << "tstep: " << tstep << endl;
         }
         else if((i==0) && (i==(n-1)))
         {
+            cout << "hello there 4" << endl;
             acc = mvImuFromLastFrame[i].a;
             angVel = mvImuFromLastFrame[i].w;
             tstep = mCurrentFrame.mTimeStamp-mCurrentFrame.mpPrevFrame->mTimeStamp;
+            cout << "tstep: " << tstep << endl;
         }
 
         if (!mpImuPreintegratedFromLastKF)

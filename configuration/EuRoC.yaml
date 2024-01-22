@@ -8,24 +8,25 @@ File.version: "1.0"
 Camera.type: "PinHole"
 
 # Camera calibration and distortion parameters (OpenCV) 
-Camera1.fx: 1687.3635109344564
-Camera1.fy: 1686.4183406093182
-Camera1.cx: 1083.371127796270
-Camera1.cy: 488.98168533232973
+Camera1.fx: 458.654
+Camera1.fy: 457.296
+Camera1.cx: 367.215
+Camera1.cy: 248.375
 
-Camera1.k1: -0.6108525677527605
-Camera1.k2: 0.5228040752508638
-Camera1.p1: 0.009934142873051915
-Camera1.p2: -0.008441967351243432
+Camera1.k1: -0.28340811
+Camera1.k2: 0.07395907
+Camera1.p1: 0.00019359
+Camera1.p2: 1.76187114e-05
 
-Camera.width: 1920
-Camera.height: 1080
+# Camera resolution
+Camera.width: 752
+Camera.height: 480
 
 Camera.newWidth: 600
 Camera.newHeight: 350
 
 # Camera frames per second 
-Camera.fps: 22
+Camera.fps: 20
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
 Camera.RGB: 1
@@ -41,11 +42,11 @@ IMU.T_b_c1: !!opencv-matrix
          0.0, 0.0, 0.0, 1.0]
 
 # IMU noise
-IMU.NoiseGyro: 0.017932740043285014
-IMU.NoiseAcc: 0.001388191802046248
-IMU.GyroWalk: 0.001388191802046248
-IMU.AccWalk: 0.00042995660202430926
-IMU.Frequency: 22.0
+IMU.NoiseGyro: 1.7e-4 #1.6968e-04 
+IMU.NoiseAcc: 2.0000e-3 #2.0e-3
+IMU.GyroWalk: 1.9393e-05 
+IMU.AccWalk: 3.0000e-03 # 3e-03
+IMU.Frequency: 200.0
 
 #--------------------------------------------------------------------------------------------
 # ORB Parameters
@@ -81,4 +82,5 @@ Viewer.ViewpointY: -0.7
 Viewer.ViewpointZ: -3.5 # -1.8
 Viewer.ViewpointF: 500.0
 
-System.SaveAtlasToFile: "../atlases/atlas.txt"
+# System.LoadAtlasFromFile: "mapeuro"
+System.SaveAtlasToFile: "mapeuro"
