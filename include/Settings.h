@@ -113,7 +113,10 @@ namespace ORB_SLAM3 {
         float imageViewerScale() {return imageViewerScale_;}
 
         std::string atlasLoadFile() {return sLoadFrom_;}
-        std::string atlasSaveFile() {return sSaveto_;}
+        std::string atlasSaveFile() {
+            // std::cout << "moose groovy: " << sSaveto_ << std::endl;
+            return sSaveto_;
+        }
 
         float thFarPoints() {return thFarPoints_;}
 

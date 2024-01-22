@@ -103,3 +103,5 @@ borrar/*
 install/
 log/
 *.code-workspace
+
+atlases

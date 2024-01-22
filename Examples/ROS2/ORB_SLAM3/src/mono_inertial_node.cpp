@@ -16,7 +16,7 @@ MonoInertialNode::MonoInertialNode(ORB_SLAM3::System* pSLAM, const bool bClahe) 
     Node("mono_inertial_node")
 {
     sub_imu_ = this->create_subscription<sensor_msgs::msg::Imu>("/imu", 1000, std::bind(&MonoInertialNode::GrabImu, this, _1));
-    sub_img0_ = this->create_subscription<sensor_msgs::msg::Image>("/camera/image_raw", 1000, std::bind(&MonoInertialNode::GrabImage, this, _1));
+    sub_img0_ = this->create_subscription<sensor_msgs::msg::Image>("/camera/image_raw", 100, std::bind(&MonoInertialNode::GrabImage, this, _1));
 
     syncThread_ = new std::thread(&MonoInertialNode::SyncWithImu,this);
 }

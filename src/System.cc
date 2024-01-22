@@ -80,6 +80,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
         mStrLoadAtlasFromFile = settings_->atlasLoadFile();
         mStrSaveAtlasToFile = settings_->atlasSaveFile();
+        cout << "moose: " << mStrSaveAtlasToFile << endl;
 
         cout << (*settings_) << endl;
     }
@@ -95,6 +96,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
         if(!node.empty() && node.isString())
         {
             mStrSaveAtlasToFile = (string)node;
+            cout << "Save Atlas to file: " << mStrLoadAtlasFromFile << endl;
         }
     }
 
@@ -543,7 +545,6 @@ void System::Shutdown()
         }*/
         /*usleep(5000);
     }*/
-
     if(!mStrSaveAtlasToFile.empty())
     {
         Verbose::PrintMess("Atlas saving to file " + mStrSaveAtlasToFile, Verbose::VERBOSITY_NORMAL);
@@ -1056,7 +1057,6 @@ void System::SaveTrajectoryEuRoC(const string &filename, Map* pMap)
 void System::SaveKeyFrameTrajectoryEuRoC(const string &filename)
 {
     cout << endl << "Saving keyframe trajectory to " << filename << " ..." << endl;
-
     vector<Map*> vpMaps = mpAtlas->GetAllMaps();
     Map* pBiggerMap;
     int numMaxKFs = 0;
@@ -1429,6 +1429,7 @@ void System::SaveAtlas(int type){
         }
         else if(type == BINARY_FILE) // File binary
         {
+            cout << "grooving moose: " << pathSaveFileName << endl;
             cout << "Starting to write the save binary file" << endl;
             std::remove(pathSaveFileName.c_str());
             std::ofstream ofs(pathSaveFileName, std::ios::binary);
