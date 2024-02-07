@@ -80,7 +80,6 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
         mStrLoadAtlasFromFile = settings_->atlasLoadFile();
         mStrSaveAtlasToFile = settings_->atlasSaveFile();
-        cout << "moose: " << mStrSaveAtlasToFile << endl;
 
         cout << (*settings_) << endl;
     }
@@ -105,6 +104,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     if(!node.empty())
     {
         activeLC = static_cast<int>(fsSettings["loopClosing"]) != 0;
+        cout << "Loop Closing is set to: " << activeLC << endl;
     }
 
     mStrVocabularyFilePath = strVocFile;
@@ -240,7 +240,6 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     // Fix verbosity
     Verbose::SetTh(Verbose::VERBOSITY_QUIET);
-
 }
 
 Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp, const vector<IMU::Point>& vImuMeas, string filename)
@@ -400,6 +399,7 @@ Sophus::SE3f System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap, const
 
 Sophus::SE3f System::TrackMonocular(const cv::Mat &im, const double &timestamp, const vector<IMU::Point>& vImuMeas, string filename)
 {
+
     {
         unique_lock<mutex> lock(mMutexReset);
         if(mbShutDown)
@@ -545,6 +545,7 @@ void System::Shutdown()
         }*/
         /*usleep(5000);
     }*/
+
     if(!mStrSaveAtlasToFile.empty())
     {
         Verbose::PrintMess("Atlas saving to file " + mStrSaveAtlasToFile, Verbose::VERBOSITY_NORMAL);
@@ -1057,6 +1058,7 @@ void System::SaveTrajectoryEuRoC(const string &filename, Map* pMap)
 void System::SaveKeyFrameTrajectoryEuRoC(const string &filename)
 {
     cout << endl << "Saving keyframe trajectory to " << filename << " ..." << endl;
+
     vector<Map*> vpMaps = mpAtlas->GetAllMaps();
     Map* pBiggerMap;
     int numMaxKFs = 0;
@@ -1429,7 +1431,6 @@ void System::SaveAtlas(int type){
         }
         else if(type == BINARY_FILE) // File binary
         {
-            cout << "grooving moose: " << pathSaveFileName << endl;
             cout << "Starting to write the save binary file" << endl;
             std::remove(pathSaveFileName.c_str());
             std::ofstream ofs(pathSaveFileName, std::ios::binary);
@@ -1546,4 +1547,3 @@ string System::CalculateCheckSum(string filename, int type)
 }
 
 } //namespace ORB_SLAM
-

@@ -122,7 +122,7 @@ public:
     void SetIniertialBA1();
     void SetIniertialBA2();
     bool GetIniertialBA1();
-    bool GetIniertialBA2();
+    bool GetInertialBA2();
 
     void PrintEssentialGraph();
     bool CheckEssentialGraph();

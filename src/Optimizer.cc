@@ -3142,7 +3142,7 @@ void Optimizer::InertialOptimization(Map *pMap, Eigen::Matrix3d &Rwg, double &sc
             if(!pKFi->mpImuPreintegrated)
                 std::cout << "Not preintegrated measurement" << std::endl;
             pKFi->mpImuPreintegrated->SetNewBias(pKFi->mPrevKF->GetImuBias());
-            cout << "groovy moose" << endl;
+            // cout << "groovy moose" << endl;
             g2o::HyperGraph::Vertex* VP1 = optimizer.vertex(pKFi->mPrevKF->mnId);
             g2o::HyperGraph::Vertex* VV1 = optimizer.vertex(maxKFid+(pKFi->mPrevKF->mnId)+1);
             g2o::HyperGraph::Vertex* VP2 =  optimizer.vertex(pKFi->mnId);
@@ -3171,10 +3171,7 @@ void Optimizer::InertialOptimization(Map *pMap, Eigen::Matrix3d &Rwg, double &sc
 
             vppUsedKF.push_back(make_pair(pKFi->mPrevKF,pKFi));
             optimizer.addEdge(ei);
-            cout << "hello there moose" << endl;
-
         }
-        cout << "moose " << endl;
     }
 
     // Compute error for different scales
