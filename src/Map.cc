@@ -92,6 +92,7 @@ void Map::SetImuInitialized()
 bool Map::isImuInitialized()
 {
     unique_lock<mutex> lock(mMutexMap);
+    // cout << "isImuInitialized: " << mbImuInitialized << endl;
     return mbImuInitialized;
 }
 
@@ -312,9 +313,10 @@ bool Map::GetIniertialBA1()
     return mbIMU_BA1;
 }
 
-bool Map::GetIniertialBA2()
+bool Map::GetInertialBA2()
 {
     unique_lock<mutex> lock(mMutexMap);
+    // cout << "GetInertialBA2: " << mbIMU_BA2 << endl;
     return mbIMU_BA2;
 }
 

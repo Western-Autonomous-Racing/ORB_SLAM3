@@ -341,21 +341,21 @@ int main(int argc, char **argv) {
         std::vector<double> vAccel_times;
         rs2::frameset fs;
         {
-            std::unique_lock<std::mutex> lk(imu_mutex);
-            if(!image_ready)
-                cond_image_rec.wait(lk);
+                        std::unique_lock<std::mutex> lk(imu_mutex);
+                        if(!image_ready)
+                            cond_image_rec.wait(lk);
 
-#ifdef COMPILEDWITHC11
-            std::chrono::steady_clock::time_point time_Start_Process = std::chrono::steady_clock::now();
-#else
-            std::chrono::monotonic_clock::time_point time_Start_Process = std::chrono::monotonic_clock::now();
-#endif
+            #ifdef COMPILEDWITHC11
+                        std::chrono::steady_clock::time_point time_Start_Process = std::chrono::steady_clock::now();
+            #else
+                        std::chrono::steady_clock::time_point time_Start_Process = std::chrono::steady_clock::now();
+            #endif
 
-            fs = fsSLAM;
+                        fs = fsSLAM;
 
-            if(count_im_buffer>1)
-                cout << count_im_buffer -1 << " dropped frs\n";
-            count_im_buffer = 0;
+                        if(count_im_buffer>1)
+                            cout << count_im_buffer -1 << " dropped frs\n";
+                        count_im_buffer = 0;
 
             while(v_gyro_timestamp.size() > v_accel_timestamp_sync.size())
             {

@@ -1844,7 +1844,7 @@ void Tracking::Track()
                 if(mpAtlas->isImuInitialized())
                 {
                     cout << "Timestamp jump detected. State set to LOST. Reseting IMU integration..." << endl;
-                    if(!pCurrentMap->GetIniertialBA2())
+                    if(!pCurrentMap->GetInertialBA2())
                     {
                         mpSystem->ResetActiveMap();
                     }
@@ -2155,7 +2155,7 @@ void Tracking::Track()
             if (mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO || mSensor == System::IMU_RGBD)
             {
                 Verbose::PrintMess("Track lost for less than one second...", Verbose::VERBOSITY_NORMAL);
-                if(!pCurrentMap->isImuInitialized() || !pCurrentMap->GetIniertialBA2())
+                if(!pCurrentMap->isImuInitialized() || !pCurrentMap->GetInertialBA2())
                 {
                     cout << "IMU is not or recently initialized. Reseting active map..." << endl;
                     mpSystem->ResetActiveMap();
@@ -3402,7 +3402,7 @@ void Tracking::SearchLocalPoints()
             th=3;
         if(mpAtlas->isImuInitialized())
         {
-            if(mpAtlas->GetCurrentMap()->GetIniertialBA2())
+            if(mpAtlas->GetCurrentMap()->GetInertialBA2())
                 th=2;
             else
                 th=6;

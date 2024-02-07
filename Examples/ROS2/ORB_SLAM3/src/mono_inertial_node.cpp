@@ -84,17 +84,19 @@ double MonoInertialNode::GetSeconds(builtin_interfaces::msg::Time stamp)
 
 void MonoInertialNode::SyncWithImu()
 {
-  while(1)
+  while(rclcpp::ok())
   {
+    auto startTime = std::chrono::high_resolution_clock::now();
+
     cv::Mat im;
     double tImg = 0;
     double tImu = 0;
-    if (!img0Buf.empty()&& !imuBuf.empty())
+    if (!img0Buf.empty() && !imuBuf.empty())
     {
       tImg = this->GetSeconds(img0Buf.front()->header.stamp);
       if (tImg > this->GetSeconds(imuBuf.back()->header.stamp)) 
         continue;
-    
+
       this->mBufMutex.lock();
       im = GetImage(img0Buf.front());
       img0Buf.pop();
@@ -109,23 +111,46 @@ void MonoInertialNode::SyncWithImu()
         while(!imuBuf.empty() && (imuBuf.front()->header.stamp.sec + imuBuf.front()->header.stamp.nanosec / 1e9) <=tImg)
         {
           double t = this->GetSeconds(imuBuf.front()->header.stamp);
+          // float acc_x_offset = 0.231939;
+          // float acc_y_offset = 0;
+          // float acc_z_offset = 0.070294;
+          // float angvel_x_offset = 0.482711; // --
+          // float angvel_y_offset = 0.353649; // --
+          // float angvel_z_offset = 0.024390;
+
+          // float acc_x = imuBuf.front()->linear_acceleration.x + acc_x_offset;
+          // float acc_y = imuBuf.front()->linear_acceleration.y - acc_y_offset;
+          // float acc_z = imuBuf.front()->linear_acceleration.z - acc_z_offset;
+          // float gyro_x = imuBuf.front()->angular_velocity.x + angvel_x_offset;
+          // float gyro_y = imuBuf.front()->angular_velocity.y + angvel_y_offset;
+          // float gyro_z = imuBuf.front()->angular_velocity.z + angvel_z_offset;
+
           cv::Point3f acc(imuBuf.front()->linear_acceleration.x, imuBuf.front()->linear_acceleration.y, imuBuf.front()->linear_acceleration.z);
           cv::Point3f gyr(imuBuf.front()->angular_velocity.x, imuBuf.front()->angular_velocity.y, imuBuf.front()->angular_velocity.z);
+          // cv::Point3f acc(acc_x, acc_y, acc_z);
+          // cv::Point3f gyr(gyro_x, gyro_y, gyro_z);
+          // cv::Point3f acc(0.00000001, 0.00000001, 0.00000001);
+          // cv::Point3f gyr(0.00000001, 0.00000001, 0.00000001);
           vImuMeas.push_back(ORB_SLAM3::IMU::Point(acc,gyr,t));
+          // cout << "Timestamp: " << t << endl;
+          // cout << "Linear Acceleration - x: " << acc_x << " y: " << acc_y << " z: " << acc_y << endl;
+          // cout << "Angular Velocity - x: " << gyro_x << " y: " << gyro_y << " z: " << gyro_z << endl;
           
           imuBuf.pop();
         }
       }
       mBufMutex.unlock();
-      
+
       if(mbClahe)
         mClahe->apply(im,im);
-      
+
+      // cout << "Linear Acceleration - x: " << vImuMeas.back().a << " Timestamp: " << vImuMeas.back().t;
       mpSLAM->TrackMonocular(im, tImg, vImuMeas);
+
+      std::chrono::milliseconds tSleep(32);
+      std::this_thread::sleep_for(tSleep);
 
     }
     
-    std::chrono::milliseconds tSleep(1);
-    std::this_thread::sleep_for(tSleep);
   }
 }

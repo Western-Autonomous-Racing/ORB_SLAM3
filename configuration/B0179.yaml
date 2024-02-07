@@ -25,7 +25,7 @@ Camera.newWidth: 600
 Camera.newHeight: 350
 
 # Camera frames per second 
-Camera.fps: 22
+Camera.fps: 30
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
 Camera.RGB: 1
@@ -45,7 +45,7 @@ IMU.NoiseGyro: 0.017932740043285014
 IMU.NoiseAcc: 0.001388191802046248
 IMU.GyroWalk: 0.001388191802046248
 IMU.AccWalk: 0.00042995660202430926
-IMU.Frequency: 22.0
+IMU.Frequency: 186.064601443 #175.0 
 
 #--------------------------------------------------------------------------------------------
 # ORB Parameters
@@ -58,14 +58,14 @@ ORBextractor.nFeatures: 1000 # 1000
 ORBextractor.scaleFactor: 1.2
 
 # ORB Extractor: Number of levels in the scale pyramid	
-ORBextractor.nLevels: 8
+ORBextractor.nLevels: 8 # 8
 
 # ORB Extractor: Fast threshold
 # Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
 # Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
 # You can lower these values if your images have low contrast			
-ORBextractor.iniThFAST: 20
-ORBextractor.minThFAST: 7
+ORBextractor.iniThFAST: 20 # 20
+ORBextractor.minThFAST: 7 # 7
 
 #--------------------------------------------------------------------------------------------
 # Viewer Parameters
@@ -79,6 +79,6 @@ Viewer.CameraLineWidth: 3.0
 Viewer.ViewpointX: 0.0
 Viewer.ViewpointY: -0.7
 Viewer.ViewpointZ: -3.5 # -1.8
-Viewer.ViewpointF: 500.0
+Viewer.ViewpointF: 500.0 # 500
 
 System.SaveAtlasToFile: "../atlases/atlas.txt"

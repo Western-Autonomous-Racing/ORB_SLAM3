@@ -406,7 +406,6 @@ namespace ORB_SLAM3 {
                 }
             }
         }
-
         fps_ = readParameter<int>(fSettings,"Camera.fps",found);
         bRGB_ = (bool) readParameter<int>(fSettings,"Camera.RGB",found);
     }
