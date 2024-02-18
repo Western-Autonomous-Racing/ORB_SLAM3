@@ -105,3 +105,4 @@ log/
 *.code-workspace
 
 atlases
+build_logs

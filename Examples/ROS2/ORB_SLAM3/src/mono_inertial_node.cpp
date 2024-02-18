@@ -1,5 +1,4 @@
 #include "mono_inertial_node.hpp"
-
 #include<rclcpp/rclcpp.hpp>
 #include<cv_bridge/cv_bridge.h>
 #include<opencv2/core.hpp>

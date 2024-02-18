@@ -38,7 +38,18 @@ add_executable(mono_inertial
    src/ros_mono_inertial.cc
 )
 
+add_executable(stereo_inertial
+   src/stereo_inertial_node.cpp
+   src/ros_stereo_inertial.cc
+)
+
 ament_target_dependencies(mono_inertial
+   rclcpp
+   sensor_msgs
+   cv_bridge
+)
+
+ament_target_dependencies(stereo_inertial
    rclcpp
    sensor_msgs
    cv_bridge
@@ -48,9 +59,14 @@ target_link_libraries(mono_inertial
    ${LIBS}
 )
 
+target_link_libraries(stereo_inertial
+   ${LIBS}
+)
+
 
 install(TARGETS
    mono_inertial
+   stereo_inertial
    DESTINATION lib/${PROJECT_NAME}
 )
 

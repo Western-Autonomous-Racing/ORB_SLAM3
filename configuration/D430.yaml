@@ -1,0 +1,95 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters. Adjust them!
+#--------------------------------------------------------------------------------------------
+File.version: "1.0"
+
+Camera.type: "PinHole"
+
+# Rectified Camera calibration (OpenCV)
+Camera1.fx: 388.288510830127
+Camera1.fy: 389.38163495067306
+Camera1.cx: 317.03827682956904
+Camera1.cy: 237.4454272446116
+
+Camera2.fx: 388.17263434472665
+Camera2.fy: 388.95051445288414
+Camera2.cx: 316.630201367293
+Camera2.cy: 237.44670541150026
+
+Stereo.b: 0.0499585
+
+# Camera resolution
+Camera.width: 640
+Camera.height: 480
+
+# Camera frames per second 
+Camera.fps: 30
+
+# Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
+Camera.RGB: 1
+
+# Close/Far threshold. Baseline times.
+Stereo.ThDepth: 40.0
+Stereo.T_c1_c2: !!opencv-matrix
+  rows: 4
+  cols: 4
+  dt: f
+  data: [0.9999995297716954, 0.0003158144058378815, 0.0009169065593554406, -0.04964346449393107,
+         -0.00031607782165415195, 0.9999999088178724, 0.00028715683345830996, 2.752311643261665e-05,
+         -0.0009168157874852137, -0.00028744651225698196, 0.9999995384115453, -9.304903442442575e-05,
+         0,0,0,1.000000000000000]
+
+# Transformation from body-frame (imu) to left camera
+IMU.T_b_c1: !!opencv-matrix
+   rows: 4
+   cols: 4
+   dt: f
+   data: [-0.2118263720572691, -0.9466482455966285, 0.2428717505390054, -0.018071251610713712,
+          -0.04881670767988483, -0.23795207800850296, -0.9700493480347956, -0.009984335232832608,
+          0.9760873511896115, -0.21733823336049446, 0.0041922747270630445, 0.2542666723639763,
+          0.0, 0.0, 0.0, 1.0]
+
+# Do not insert KFs when recently lost
+IMU.InsertKFsWhenLost: 0
+
+# IMU noise (Use those from VINS-mono)
+IMU.NoiseGyro: 0.006500415063369998 # 2.44e-4 #1e-3 # rad/s^0.5
+IMU.NoiseAcc: 0.0019395319769648898 # 1.47e-3 #1e-2 # m/s^1.5
+IMU.GyroWalk: 0.0016103418835517293 # rad/s^1.5
+IMU.AccWalk: 0.00028103686929238224 # m/s^2.5
+IMU.Frequency: 171.228956229
+
+#--------------------------------------------------------------------------------------------
+# ORB Parameters
+#--------------------------------------------------------------------------------------------
+# ORB Extractor: Number of features per image
+ORBextractor.nFeatures: 1250
+
+# ORB Extractor: Scale factor between levels in the scale pyramid 	
+ORBextractor.scaleFactor: 1.2
+
+# ORB Extractor: Number of levels in the scale pyramid	
+ORBextractor.nLevels: 8
+
+# ORB Extractor: Fast threshold
+# Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
+# Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
+# You can lower these values if your images have low contrast			
+ORBextractor.iniThFAST: 20
+ORBextractor.minThFAST: 7
+
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#--------------------------------------------------------------------------------------------
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1.0
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2.0
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3.0
+Viewer.ViewpointX: 0.0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -3.5
+Viewer.ViewpointF: 500.0
