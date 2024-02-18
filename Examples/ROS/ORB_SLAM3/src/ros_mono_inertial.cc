@@ -175,15 +175,6 @@ void ImageGrabber::SyncWithImu()
       if(mbClahe)
         mClahe->apply(im,im);
 
-      // Set the text, position, font, scale, color, and thickness
-      // std::string text = "Hello, World!";
-      // cv::Point textOrg(50, 50); // bottom-left corner of the text string in the image
-      // int fontFace = cv::FONT_HERSHEY_SIMPLEX;
-      // double fontScale = 1;
-      // cv::Scalar color(255, 255, 255); // white color
-      // int thickness = 2;
-
-      // cv::putText(im, text, textOrg, fontFace, fontScale, color, thickness);
       mpSLAM->TrackMonocular(im,tIm,vImuMeas);
     }
 
