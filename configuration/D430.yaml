@@ -61,7 +61,7 @@ IMU.NoiseGyro: 0.00027819871974078895 # 2.44e-4 #1e-3 # rad/s^0.5
 IMU.NoiseAcc: 0.005168030720104927 # 1.47e-3 #1e-2 # m/s^1.5
 IMU.GyroWalk: 3.493593802785315e-05 # rad/s^1.5
 IMU.AccWalk: 0.0004511025478422321  # m/s^2.5
-IMU.Frequency: 192.437
+IMU.Frequency: 198.052713976
 
 #--------------------------------------------------------------------------------------------
 # ORB Parameters
@@ -69,18 +69,25 @@ IMU.Frequency: 192.437
 # ORB Extractor: Number of features per image
 ORBextractor.nFeatures: 1250
 
-# ORB Extractor: Scale factor between levels in the scale pyramid 	
+# ORB Extractor: Scale factor between levels in the scale pyramid
 ORBextractor.scaleFactor: 1.2
 
-# ORB Extractor: Number of levels in the scale pyramid	
+# ORB Extractor: Number of levels in the scale pyramid
 ORBextractor.nLevels: 8
 
 # ORB Extractor: Fast threshold
 # Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
 # Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
-# You can lower these values if your images have low contrast			
+# You can lower these values if your images have low contrast 
 ORBextractor.iniThFAST: 20
 ORBextractor.minThFAST: 7
+
+#--------------------------------------------------------------------------------------------
+# Atlas Parameters
+#--------------------------------------------------------------------------------------------
+
+# System.LoadAtlasFromFile: "map_kitchen"
+System.SaveAtlasToFile: "map_kitchen"
 
 #--------------------------------------------------------------------------------------------
 # Viewer Parameters
