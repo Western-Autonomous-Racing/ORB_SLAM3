@@ -2356,7 +2356,7 @@ void Tracking::StereoInitialization()
             if (!mFastInit && (mCurrentFrame.mpImuPreintegratedFrame->avgA-mLastFrame.mpImuPreintegratedFrame->avgA).norm()<0.5)
             {
                 cout << "not enough acceleration" << endl;
-                // return;
+                return;
             }
 
             if(mpImuPreintegratedFromLastKF)
