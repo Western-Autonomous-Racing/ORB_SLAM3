@@ -1,0 +1,104 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters. Adjust them!
+#--------------------------------------------------------------------------------------------
+File.version: "1.0"
+
+Camera.type: "PinHole"
+
+# Rectified Camera calibration (OpenCV)
+# left camera
+Camera1.fx: 446.16219760213875
+Camera1.fy: 447.1460079628033
+Camera1.cx: 431.1735915086706
+Camera1.cy: 234.30127842802864
+
+# right camera
+Camera2.fx: 446.181481041746
+Camera2.fy: 447.4084977646149
+Camera2.cx: 433.1415401062226
+Camera2.cy: 233.8814795828177
+
+Stereo.b: 0.0499585
+
+# Camera resolution
+Camera.width: 848
+Camera.height: 480
+
+# Camera frames per second 
+Camera.fps: 30
+
+# Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
+Camera.RGB: 1
+
+# Close/Far threshold. Baseline times.
+Stereo.ThDepth: 40.0
+Stereo.T_c1_c2: !!opencv-matrix
+  rows: 4
+  cols: 4
+  dt: f
+  data: [0.99999088, -0.00023155, -0.00426451, 0.04982862,
+         0.00023434, 0.99999976, 0.00065438, -0.000023,
+         0.00426436, -0.00065538, 0.99999069, 0.00046855,
+         0,0,0,1.000000000000000]
+
+# Transformation from body-frame (imu) to left camera
+IMU.T_b_c1: !!opencv-matrix
+   rows: 4
+   cols: 4
+   dt: f
+   data: [-0.02571182, -0.99887933, 0.03973644, 0.02468532,
+          0.3110579, -0.04577049, -0.94928818, 0.080827,
+          0.9500431, -0.01204759, 0.31188615, -0.14642567,
+          0.0, 0.0, 0.0, 1.0]
+
+# Do not insert KFs when recently lost
+IMU.InsertKFsWhenLost: 0
+
+# IMU noise (Use those from VINS-mono)
+IMU.NoiseGyro: 0.00019279764617848337 # 2.44e-4 #1e-3 # rad/s^0.5
+IMU.NoiseAcc: 0.003985694872086879 # 1.47e-3 #1e-2 # m/s^1.5
+IMU.GyroWalk: 3.7803653031871075e-05 # rad/s^1.5
+IMU.AccWalk: 0.0004856900953033669  # m/s^2.5
+IMU.Frequency: 198.052713976
+
+#--------------------------------------------------------------------------------------------
+# ORB Parameters
+#--------------------------------------------------------------------------------------------
+# ORB Extractor: Number of features per image
+ORBextractor.nFeatures: 1250
+
+# ORB Extractor: Scale factor between levels in the scale pyramid
+ORBextractor.scaleFactor: 1.2
+
+# ORB Extractor: Number of levels in the scale pyramid
+ORBextractor.nLevels: 8
+
+# ORB Extractor: Fast threshold
+# Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
+# Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
+# You can lower these values if your images have low contrast 
+ORBextractor.iniThFAST: 20
+ORBextractor.minThFAST: 7
+
+#--------------------------------------------------------------------------------------------
+# Atlas Parameters
+#--------------------------------------------------------------------------------------------
+
+# System.LoadAtlasFromFile: "map_kitchen"
+System.SaveAtlasToFile: "map_aceb"
+
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#--------------------------------------------------------------------------------------------
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1.0
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2.0
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3.0
+Viewer.ViewpointX: 0.0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -3.5
+Viewer.ViewpointF: 500.0
