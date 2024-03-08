@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(message_filters REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -43,6 +44,11 @@ add_executable(stereo_inertial
    src/ros_stereo_inertial.cc
 )
 
+add_executable(stereo
+   src/stereo_node.cpp
+   src/ros_stereo.cc
+)
+
 ament_target_dependencies(mono_inertial
    rclcpp
    sensor_msgs
@@ -55,6 +61,13 @@ ament_target_dependencies(stereo_inertial
    cv_bridge
 )
 
+ament_target_dependencies(stereo
+   rclcpp
+   sensor_msgs
+   message_filters
+   cv_bridge
+)
+
 target_link_libraries(mono_inertial
    ${LIBS}
 )
@@ -63,10 +76,14 @@ target_link_libraries(stereo_inertial
    ${LIBS}
 )
 
+target_link_libraries(stereo
+   ${LIBS}
+)
 
 install(TARGETS
    mono_inertial
    stereo_inertial
+   stereo
    DESTINATION lib/${PROJECT_NAME}
 )
 
