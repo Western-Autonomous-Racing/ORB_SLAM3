@@ -201,8 +201,8 @@ void StereoInertialNode::SyncWithImu()
         while(!imuBuf.empty() && this->GetSeconds(imuBuf.front()->header.stamp)<=tImLeft)
         {
           double t = this->GetSeconds(imuBuf.front()->header.stamp);
-          cv::Point3f acc(imuBuf.front()->linear_acceleration.x + 1.419318, imuBuf.front()->linear_acceleration.y - 0.636065, imuBuf.front()->linear_acceleration.z - 10.609555);
-          cv::Point3f gyr(imuBuf.front()->angular_velocity.x + 0.038342, imuBuf.front()->angular_velocity.y + 0.044320, imuBuf.front()->angular_velocity.z - 0.023360);
+          cv::Point3f acc(imuBuf.front()->linear_acceleration.x, imuBuf.front()->linear_acceleration.y, imuBuf.front()->linear_acceleration.z);
+          cv::Point3f gyr(imuBuf.front()->angular_velocity.x, imuBuf.front()->angular_velocity.y, imuBuf.front()->angular_velocity.z);
           vImuMeas.push_back(ORB_SLAM3::IMU::Point(acc,gyr,t));
           imuBuf.pop();
         }
