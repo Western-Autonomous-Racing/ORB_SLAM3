@@ -59,9 +59,9 @@ StereoNode::~StereoNode()
 {
   // Save camera trajectory
   mpSLAM->SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
-
   // Stop all threads
   mpSLAM->Shutdown();
+  
 }
 
 cv::Mat StereoNode::GetImage(const sensor_msgs::msg::Image::ConstSharedPtr img_msg)
@@ -98,6 +98,8 @@ double StereoNode::GetSeconds(builtin_interfaces::msg::Time stamp)
 
 void StereoNode::SyncStereo(const sensor_msgs::msg::Image::ConstSharedPtr leftImg, const sensor_msgs::msg::Image::ConstSharedPtr rightImg)
 {
+
+  Sophus::SE3<float> pose;
   // Copy the ros image message to cv::Mat.
   cv_bridge::CvImageConstPtr cv_ptrLeft;
   try
@@ -130,6 +132,8 @@ void StereoNode::SyncStereo(const sensor_msgs::msg::Image::ConstSharedPtr leftIm
   }
   else
   {
-    mpSLAM->TrackStereo(cv_ptrLeft->image, cv_ptrRight->image, GetSeconds(leftImg->header.stamp));
+    pose = mpSLAM->TrackStereo(cv_ptrLeft->image, cv_ptrRight->image, GetSeconds(leftImg->header.stamp));
+    cout << "Pose: x: " << pose.translation().x() << " y: " << pose.translation().y() << " z: " << pose.translation().z() << endl;
+    cout << "Rotation: " << pose.unit_quaternion().x() << " " << pose.unit_quaternion().y() << " " << pose.unit_quaternion().z() << " " << pose.unit_quaternion().w() << endl;
   }
 }

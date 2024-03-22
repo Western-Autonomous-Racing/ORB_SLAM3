@@ -317,6 +317,7 @@ Sophus::SE3f System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, 
     Sophus::SE3f Tcw = mpTracker->GrabImageStereo(imLeftToFeed,imRightToFeed,timestamp,filename);
 
     // std::cout << "out grabber" << std::endl;
+    setCurrentTwC(Tcw);
 
     unique_lock<mutex> lock2(mMutexState);
     mTrackingState = mpTracker->mState;
@@ -474,7 +475,17 @@ Sophus::SE3f System::TrackMonocular(const cv::Mat &im, const double &timestamp, 
     return Tcw;
 }
 
+void System::setCurrentTwC(const Sophus::SE3f& Twc)
+{
+    unique_lock<mutex> lock(mMutexState);
+    currentTwc_ = Twc;
+}
 
+Sophus::SE3f System::getCurrentTwC()
+{
+    unique_lock<mutex> lock(mMutexState);
+    return currentTwc_;
+}
 
 void System::ActivateLocalizationMode()
 {

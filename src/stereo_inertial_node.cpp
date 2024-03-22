@@ -62,6 +62,8 @@ StereoInertialNode::StereoInertialNode(ORB_SLAM3::System *pSLAM, const bool bRec
 
 StereoInertialNode::~StereoInertialNode()
 {
+  syncThread_->join();
+  delete syncThread_;
   // Save camera trajectory
   mpSLAM->SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
 
