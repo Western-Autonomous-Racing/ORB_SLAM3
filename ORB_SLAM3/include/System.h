@@ -120,6 +120,9 @@ public:
     // Returns the camera pose (empty if tracking fails).
     Sophus::SE3f TrackMonocular(const cv::Mat &im, const double &timestamp, const vector<IMU::Point>& vImuMeas = vector<IMU::Point>(), string filename="");
 
+    void setCurrentTwC(const Sophus::SE3f& Twc);
+
+    Sophus::SE3f getCurrentTwC();
 
     // This stops local mapping thread (map building) and performs only camera tracking.
     void ActivateLocalizationMode();
@@ -266,6 +269,8 @@ private:
     string mStrVocabularyFilePath;
 
     Settings* settings_;
+
+    Sophus::SE3f currentTwc_;
 };
 
 }// namespace ORB_SLAM

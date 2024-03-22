@@ -27,9 +27,10 @@ MonoInertialNode::~MonoInertialNode()
 
   // Save camera trajectory
   mpSLAM->SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
-
-  // Stop all threads
+  
+    // Stop all threads
   mpSLAM->Shutdown();
+  
 }
 
 void MonoInertialNode::GrabImu(const sensor_msgs::msg::Imu::ConstSharedPtr imu_msg)

@@ -38,7 +38,9 @@ private:
     std::vector<ORB_SLAM3::KeyFrame*> trajectory_;
 
     // Pose
-    Sophus::SE3<float> pose_;
+    Sophus::SE3<float> current_pose_, initial_pose_;
+    Eigen::Matrix3f pose_trans_;
+    Eigen::Quaternionf pose_rot_;
 
     // publishers
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr raw_map_points_pub_, refined_map_points_pub_;

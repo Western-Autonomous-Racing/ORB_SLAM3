@@ -21,8 +21,12 @@ MapNode::~MapNode()
     publishing_thread_->join();
     delete publishing_thread_;
     // Stop all threads
-    mpSLAM->Shutdown();
-    delete mpSLAM;
+
+    if (mpSLAM)
+    {
+        mpSLAM->Shutdown();
+        delete mpSLAM;
+    }
 }
 
 // Map points -> GetAllMapPoints() (Atlas.h/Map.h)
@@ -42,7 +46,7 @@ void MapNode::GeneratingMap()
         // Get the trajectory
         trajectory_ = mpSLAM->GetAtlas()->GetAllKeyFrames();
         // Get the current pose
-        pose_ = mpSLAM->GetTracker()->mCurrentFrame.GetPose();
+        current_pose_ = mpSLAM->getCurrentTwC();
 
         // Refine the point cloud
         RefinePointCloud();
@@ -100,26 +104,24 @@ void MapNode::GeneratingMap()
         // Publish the trajectory
         trajectory_msg.header.frame_id = "trajectory";
         trajectory_msg.header.stamp = frame_timestamp;
-        
-        
 
         // Publish the pose
         pose_msg.header.frame_id = "pose";
         pose_msg.header.stamp = frame_timestamp;
-        pose_msg.pose.position.x = pose_.translation()(2);
-        pose_msg.pose.position.y = -pose_.translation()(0);
-        pose_msg.pose.position.z = -pose_.translation()(1);
+        pose_msg.pose.position.x = current_pose_.translation()(2);
+        pose_msg.pose.position.y = -current_pose_.translation()(0);
+        pose_msg.pose.position.z = -current_pose_.translation()(1);
         
-        Eigen::Matrix3f R = pose_.rotationMatrix();
-        Eigen::Quaternionf q(R);
-        pose_msg.pose.orientation.x = q.x();
-        pose_msg.pose.orientation.y = q.y();
-        pose_msg.pose.orientation.z = q.z();
-        pose_msg.pose.orientation.w = q.w();
+        Eigen::Quaternionf R = current_pose_.unit_quaternion();
+        pose_msg.pose.orientation.x = R.x();
+        pose_msg.pose.orientation.y = R.y();
+        pose_msg.pose.orientation.z = R.z();
+        pose_msg.pose.orientation.w = R.w();
 
         pose_stamped_pub_->publish(pose_msg);
 
         // Publish the refined map points
+
 
         // Publish the occupancy grid
     }
