@@ -11,6 +11,9 @@ find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Pangolin REQUIRED)
@@ -49,6 +52,14 @@ add_executable(stereo
    src/ros_stereo.cc
 )
 
+add_executable(map
+   src/map_node.cpp
+   src/mono_inertial_node.cpp
+   src/stereo_inertial_node.cpp
+   src/stereo_node.cpp
+   src/ros_map.cc
+)
+
 ament_target_dependencies(mono_inertial
    rclcpp
    sensor_msgs
@@ -68,6 +79,16 @@ ament_target_dependencies(stereo
    cv_bridge
 )
 
+ament_target_dependencies(map
+   rclcpp
+   sensor_msgs
+   message_filters
+   cv_bridge
+   geometry_msgs
+   nav_msgs
+   tf2_ros
+)
+
 target_link_libraries(mono_inertial
    ${LIBS}
 )
@@ -80,10 +101,15 @@ target_link_libraries(stereo
    ${LIBS}
 )
 
+target_link_libraries(map
+   ${LIBS}
+)
+
 install(TARGETS
    mono_inertial
    stereo_inertial
    stereo
+   map
    DESTINATION lib/${PROJECT_NAME}
 )
 

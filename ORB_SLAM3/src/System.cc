@@ -1346,6 +1346,16 @@ double System::GetTimeFromIMUInit()
         return 0.f;
 }
 
+Atlas* System::GetAtlas()
+{
+    return mpAtlas;
+}
+
+Tracking* System::GetTracker()
+{
+    return mpTracker;
+}
+
 bool System::isLost()
 {
     if (!mpAtlas->isImuInitialized())
