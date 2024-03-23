@@ -3,12 +3,11 @@
 using namespace std;
 
 MapNode::MapNode(ORB_SLAM3::System *pSLAM)
-    : Node("map_node"), mpSLAM(pSLAM)
+    : Node("map_node"), mpSLAM(pSLAM), tf_broadcaster_(this)
 {
 
     raw_map_points_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("/raw_map_points", 100);
-    // trajectory_pub_ = this->create_publisher<nav_msgs::msg::Odometry>("/trajectory", 100);
-    pose_stamped_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("/pose_stamped", 100);
+    odom_pub_ = this->create_publisher<nav_msgs::msg::Odometry>("/egocar/odom", 100);
     // refined_map_points_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("/refined_map_points", 100);
     // occupancy_grid_pub_ = this->create_publisher<nav_msgs::msg::OccupancyGrid>("/occupancy_grid", 100);
     
@@ -21,12 +20,6 @@ MapNode::~MapNode()
     publishing_thread_->join();
     delete publishing_thread_;
     // Stop all threads
-
-    if (mpSLAM)
-    {
-        mpSLAM->Shutdown();
-        delete mpSLAM;
-    }
 }
 
 // Map points -> GetAllMapPoints() (Atlas.h/Map.h)
@@ -36,17 +29,21 @@ void MapNode::GeneratingMap()
 {
     const int num_coords = 3; // x, y, z
     sensor_msgs::msg::PointCloud2 raw_map_points_msg;
-    nav_msgs::msg::Odometry trajectory_msg;
+    nav_msgs::msg::Odometry odom_msg;
     geometry_msgs::msg::PoseStamped pose_msg;
+    rclcpp::Time frame_timestamp, prev_timestamp = rclcpp::Time(0);
+    prev_pose_ = Sophus::SE3f();
+    Eigen::Quaternionf R2;
 
     while (rclcpp::ok())
     {
         // Get the map
         raw_map_points_ = mpSLAM->GetAtlas()->GetAllMapPoints();
         // Get the trajectory
-        trajectory_ = mpSLAM->GetAtlas()->GetAllKeyFrames();
+        // trajectory_ = mpSLAM->GetAtlas()->GetAllKeyFrames();
         // Get the current pose
         current_pose_ = mpSLAM->getCurrentTwC();
+        R2 = current_pose_.unit_quaternion();
 
         // Refine the point cloud
         RefinePointCloud();
@@ -56,10 +53,10 @@ void MapNode::GeneratingMap()
 
         // Publish the map topics
 
-        rclcpp::Time frame_timestamp = this->now();
+        frame_timestamp = this->now();
 
         // Publish the raw map points
-        raw_map_points_msg.header.frame_id = "map";
+        raw_map_points_msg.header.frame_id = "odom"; // "map"
         raw_map_points_msg.header.stamp = frame_timestamp;
         raw_map_points_msg.height = 1;
         raw_map_points_msg.width = raw_map_points_.size();
@@ -102,29 +99,79 @@ void MapNode::GeneratingMap()
         }
 
         // Publish the trajectory
-        trajectory_msg.header.frame_id = "trajectory";
-        trajectory_msg.header.stamp = frame_timestamp;
+        if (GetSeconds(prev_timestamp) == 0.0)
+        {
+            prev_timestamp = frame_timestamp;
+            prev_pose_ = current_pose_;
+            cout << "Initial Pose" << endl;
+        }
 
-        // Publish the pose
-        pose_msg.header.frame_id = "pose";
-        pose_msg.header.stamp = frame_timestamp;
-        pose_msg.pose.position.x = current_pose_.translation()(2);
-        pose_msg.pose.position.y = -current_pose_.translation()(0);
-        pose_msg.pose.position.z = -current_pose_.translation()(1);
+        if (current_pose_.translation()(2) == prev_pose_.translation()(2) && current_pose_.translation()(0) == prev_pose_.translation()(0) && current_pose_.translation()(1) == prev_pose_.translation()(1))
+        {
+            continue;
+        }
+
+        // Create odom transform
+        odom_trans_.header.stamp = frame_timestamp;
+        odom_trans_.header.frame_id = "odom";
+        odom_trans_.child_frame_id = "base_link";
+        odom_trans_.transform.translation.x = static_cast<double>(current_pose_.translation().x());
+        odom_trans_.transform.translation.y = static_cast<double>(-current_pose_.translation().y());
+        odom_trans_.transform.translation.z = static_cast<double>(-current_pose_.translation().z());
+        odom_trans_.transform.rotation.x = static_cast<double>(R2.x());
+        odom_trans_.transform.rotation.y = static_cast<double>(R2.y());
+        odom_trans_.transform.rotation.z = static_cast<double>(R2.z());
+        odom_trans_.transform.rotation.w = static_cast<double>(R2.w());
+
+        tf_broadcaster_.sendTransform(odom_trans_);        
+
+        odom_msg.header.stamp = frame_timestamp;
+        odom_msg.header.frame_id = "odom";
+        odom_msg.child_frame_id = "base_link";
+        odom_msg.pose.pose.position.x = static_cast<double>(-current_pose_.translation().x());
+        odom_msg.pose.pose.position.y = static_cast<double>(-current_pose_.translation().y());
+        odom_msg.pose.pose.position.z = static_cast<double>(-current_pose_.translation().z());
+
+        cout << "Moose Current Pose x: " << current_pose_.translation().x() << " y: " << current_pose_.translation().y() << " z: " << current_pose_.translation().z() << endl;
         
-        Eigen::Quaternionf R = current_pose_.unit_quaternion();
-        pose_msg.pose.orientation.x = R.x();
-        pose_msg.pose.orientation.y = R.y();
-        pose_msg.pose.orientation.z = R.z();
-        pose_msg.pose.orientation.w = R.w();
+        odom_msg.pose.pose.orientation.x = static_cast<double>(R2.x());
+        odom_msg.pose.pose.orientation.y = static_cast<double>(R2.y());
+        odom_msg.pose.pose.orientation.z = static_cast<double>(R2.z());
+        odom_msg.pose.pose.orientation.w = static_cast<double>(R2.w());
+        odom_msg.pose.covariance = {0.01, 0, 0, 0, 0, 0,
+                                    0, 0.01, 0, 0, 0, 0,
+                                    0, 0, 0.01, 0, 0, 0,
+                                    0, 0, 0, 0.01, 0, 0,
+                                    0, 0, 0, 0, 0.01, 0,
+                                    0, 0, 0, 0, 0, 0.01};
 
-        pose_stamped_pub_->publish(pose_msg);
+        odom_msg.twist.twist.linear.x = static_cast<double>(current_pose_.translation().x() - prev_pose_.translation().x()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.linear.y = static_cast<double>(current_pose_.translation().y() - prev_pose_.translation().y()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.linear.z = static_cast<double>(current_pose_.translation().z()) - (-prev_pose_.translation().z()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.angular.x = static_cast<double>(current_pose_.unit_quaternion().x() - prev_pose_.unit_quaternion().x()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.angular.y = static_cast<double>(current_pose_.unit_quaternion().y() - prev_pose_.unit_quaternion().y()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.angular.z = static_cast<double>(current_pose_.unit_quaternion().z() - prev_pose_.unit_quaternion().z()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.covariance = {0.01, 0, 0, 0, 0, 0,
+                                     0, 0.01, 0, 0, 0, 0,
+                                     0, 0, 0.01, 0, 0, 0,
+                                     0, 0, 0, 0.01, 0, 0,
+                                     0, 0, 0, 0, 0.01, 0,
+                                     0, 0, 0, 0, 0, 0.01};
+
+        odom_pub_->publish(odom_msg);
 
         // Publish the refined map points
 
-
         // Publish the occupancy grid
+
+        prev_timestamp = frame_timestamp;
+        prev_pose_ = current_pose_;
     }
+}
+
+double MapNode::GetSeconds(builtin_interfaces::msg::Time stamp)
+{
+  return stamp.sec + stamp.nanosec / 1000000000.0;
 }
 
 // void RefinePointCloud();
@@ -147,3 +194,5 @@ void MapNode::RefinePointCloud()
 void MapNode::OccupancyGrid()
 {
 }
+
+// void SaveMap(mapPoints, trajectory, pose); 

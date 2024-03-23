@@ -86,7 +86,7 @@ int main(int argc, char **argv)
             return 1;
         }
         std::string sbRect(argv[4]);
-        ORB_SLAM3::System SLAM(argv[2], argv[3], ORB_SLAM3::System::IMU_STEREO, false);
+        ORB_SLAM3::System SLAM(argv[2], argv[3], ORB_SLAM3::System::IMU_STEREO, true);
         auto stereo_inertial_node = std::make_shared<StereoInertialNode>(&SLAM, sbRect == "true", bEqual, argv[3]);
         executor.add_node(stereo_inertial_node);
         cout << "Running Mapping..." << endl;
