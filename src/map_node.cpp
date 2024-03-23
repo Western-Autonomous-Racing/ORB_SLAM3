@@ -115,9 +115,9 @@ void MapNode::GeneratingMap()
         odom_trans_.header.stamp = frame_timestamp;
         odom_trans_.header.frame_id = "odom";
         odom_trans_.child_frame_id = "base_link";
-        odom_trans_.transform.translation.x = static_cast<double>(current_pose_.translation().x());
-        odom_trans_.transform.translation.y = static_cast<double>(-current_pose_.translation().y());
-        odom_trans_.transform.translation.z = static_cast<double>(-current_pose_.translation().z());
+        odom_trans_.transform.translation.x = static_cast<double>(-current_pose_.translation().z());
+        odom_trans_.transform.translation.y = static_cast<double>(-current_pose_.translation().x());
+        odom_trans_.transform.translation.z = static_cast<double>(current_pose_.translation().y());
         odom_trans_.transform.rotation.x = static_cast<double>(R2.x());
         odom_trans_.transform.rotation.y = static_cast<double>(R2.y());
         odom_trans_.transform.rotation.z = static_cast<double>(R2.z());
@@ -128,29 +128,29 @@ void MapNode::GeneratingMap()
         odom_msg.header.stamp = frame_timestamp;
         odom_msg.header.frame_id = "odom";
         odom_msg.child_frame_id = "base_link";
-        odom_msg.pose.pose.position.x = static_cast<double>(-current_pose_.translation().x());
-        odom_msg.pose.pose.position.y = static_cast<double>(-current_pose_.translation().y());
-        odom_msg.pose.pose.position.z = static_cast<double>(-current_pose_.translation().z());
+        odom_msg.pose.pose.position.x = static_cast<double>(current_pose_.translation().z());
+        odom_msg.pose.pose.position.y = static_cast<double>(current_pose_.translation().x());
+        odom_msg.pose.pose.position.z = static_cast<double>(current_pose_.translation().y());
 
-        cout << "Moose Current Pose x: " << current_pose_.translation().x() << " y: " << current_pose_.translation().y() << " z: " << current_pose_.translation().z() << endl;
+        cout << "Moose Current Pose x: " << current_pose_.translation().z() << " y: " << current_pose_.translation().x() << " z: " << current_pose_.translation().y() << endl;
         
-        odom_msg.pose.pose.orientation.x = static_cast<double>(R2.x());
+        odom_msg.pose.pose.orientation.x = static_cast<double>(R2.z());
         odom_msg.pose.pose.orientation.y = static_cast<double>(R2.y());
-        odom_msg.pose.pose.orientation.z = static_cast<double>(R2.z());
+        odom_msg.pose.pose.orientation.z = static_cast<double>(R2.x());
         odom_msg.pose.pose.orientation.w = static_cast<double>(R2.w());
         odom_msg.pose.covariance = {0.01, 0, 0, 0, 0, 0,
-                                    0, 0.01, 0, 0, 0, 0,
-                                    0, 0, 0.01, 0, 0, 0,
-                                    0, 0, 0, 0.01, 0, 0,
-                                    0, 0, 0, 0, 0.01, 0,
-                                    0, 0, 0, 0, 0, 0.01};
+                        0, 0.01, 0, 0, 0, 0,
+                        0, 0, 0.01, 0, 0, 0,
+                        0, 0, 0, 0.01, 0, 0,
+                        0, 0, 0, 0, 0.01, 0,
+                        0, 0, 0, 0, 0, 0.01};
 
-        odom_msg.twist.twist.linear.x = static_cast<double>(current_pose_.translation().x() - prev_pose_.translation().x()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.linear.x = static_cast<double>(current_pose_.translation().z() - prev_pose_.translation().z()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
         odom_msg.twist.twist.linear.y = static_cast<double>(current_pose_.translation().y() - prev_pose_.translation().y()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
-        odom_msg.twist.twist.linear.z = static_cast<double>(current_pose_.translation().z()) - (-prev_pose_.translation().z()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
-        odom_msg.twist.twist.angular.x = static_cast<double>(current_pose_.unit_quaternion().x() - prev_pose_.unit_quaternion().x()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
-        odom_msg.twist.twist.angular.y = static_cast<double>(current_pose_.unit_quaternion().y() - prev_pose_.unit_quaternion().y()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
-        odom_msg.twist.twist.angular.z = static_cast<double>(current_pose_.unit_quaternion().z() - prev_pose_.unit_quaternion().z()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.linear.z = static_cast<double>(current_pose_.translation().x() - prev_pose_.translation().x()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.angular.x = static_cast<double>(current_pose_.unit_quaternion().z() - prev_pose_.unit_quaternion().z()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.angular.y = static_cast<double>(current_pose_.unit_quaternion().x() - prev_pose_.unit_quaternion().x()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.angular.z = static_cast<double>(current_pose_.unit_quaternion().y() - prev_pose_.unit_quaternion().y()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
         odom_msg.twist.covariance = {0.01, 0, 0, 0, 0, 0,
                                      0, 0.01, 0, 0, 0, 0,
                                      0, 0, 0.01, 0, 0, 0,
