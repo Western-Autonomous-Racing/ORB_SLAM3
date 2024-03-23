@@ -2211,6 +2211,7 @@ void Tracking::Track()
         if(mCurrentFrame.isSet())
             mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.GetPose());
 
+
         if(bOK || mState==RECENTLY_LOST)
         {
             // Update motion model
