@@ -1,9 +1,14 @@
 #ifndef __MAP_CREATION_H__
 #define __MAP_CREATION_H__
 
+#define RAW_MAP_POINT_TOPIC "/raw_map_points"
+#define REFINED_MAP_POINT_TOPIC "/refined_map_points"
+#define ODOM_TOPIC "/egocar/odom"
+
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
@@ -21,14 +26,13 @@ class MapNode : public rclcpp::Node
 {
 public:
 
-    MapNode(ORB_SLAM3::System *pSLAMal); // Constructor - gets SLAM system pointer
+    MapNode(ORB_SLAM3::System *pSLAM); // Constructor - gets SLAM system pointer
     ~MapNode();
 
     void RunMapping(); // run everything else
     void RefinePointCloud();
     void OccupancyGrid();
     double GetSeconds(builtin_interfaces::msg::Time stamp);
-    // void record_Data(std::shared_ptr<sensor_msgs::msg::PointCloud2> raw_map_points_msg, std::shared_ptr<nav_msgs::msg::Odometry> odom_msg);
 
 private:
 
@@ -47,12 +51,23 @@ private:
     // publishers
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr raw_map_points_pub_, refined_map_points_pub_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
-    rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr occupancy_grid_pub_;
+    // rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr occupancy_grid_pub_;
 
     tf2_ros::TransformBroadcaster tf_broadcaster_;
     geometry_msgs::msg::TransformStamped odom_trans_;
 
     thread *publishing_thread_;
+
+    // subscribers to save
+    rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr raw_map_points_sub_, refined_map_points_sub_;
+    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
+
+    string map_name_, map_dir_;
+    int map_type_;
+
+    sensor_msgs::msg::PointCloud2 raw_map_points_msg_, refined_map_points_msg_;
+    nav_msgs::msg::Odometry odom_msg_;
+
 };
 
 
