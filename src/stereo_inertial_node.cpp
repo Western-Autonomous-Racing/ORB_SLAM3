@@ -64,8 +64,6 @@ StereoInertialNode::~StereoInertialNode()
 {
   syncThread_->join();
   delete syncThread_;
-  // Save camera trajectory
-  mpSLAM->SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
 
   // Stop all threads
   mpSLAM->Shutdown();

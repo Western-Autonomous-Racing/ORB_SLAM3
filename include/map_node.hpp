@@ -24,10 +24,11 @@ public:
     MapNode(ORB_SLAM3::System *pSLAMal); // Constructor - gets SLAM system pointer
     ~MapNode();
 
-    void GeneratingMap(); // run everything else
+    void RunMapping(); // run everything else
     void RefinePointCloud();
     void OccupancyGrid();
     double GetSeconds(builtin_interfaces::msg::Time stamp);
+    // void record_Data(std::shared_ptr<sensor_msgs::msg::PointCloud2> raw_map_points_msg, std::shared_ptr<nav_msgs::msg::Odometry> odom_msg);
 
 private:
 

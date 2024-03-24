@@ -1,6 +1,7 @@
 #include "../include/map_node.hpp"
 
 using namespace std;
+using std::placeholders::_1;
 
 MapNode::MapNode(ORB_SLAM3::System *pSLAM)
     : Node("map_node"), mpSLAM(pSLAM), tf_broadcaster_(this)
@@ -12,7 +13,7 @@ MapNode::MapNode(ORB_SLAM3::System *pSLAM)
     // occupancy_grid_pub_ = this->create_publisher<nav_msgs::msg::OccupancyGrid>("/occupancy_grid", 100);
     
 
-    publishing_thread_ = new thread(&MapNode::GeneratingMap, this);
+    publishing_thread_ = new thread(&MapNode::RunMapping, this);
 }
 
 MapNode::~MapNode()
@@ -25,7 +26,7 @@ MapNode::~MapNode()
 // Map points -> GetAllMapPoints() (Atlas.h/Map.h)
 // Trajectory -> GetAllKeyFrames() (Atlas.h/Map.h)
 // Get Current Pose() -> TrackStereo(), etc. (System.h) (Tcw)
-void MapNode::GeneratingMap()
+void MapNode::RunMapping()
 {
     const int num_coords = 3; // x, y, z
     sensor_msgs::msg::PointCloud2 raw_map_points_msg;
@@ -42,7 +43,7 @@ void MapNode::GeneratingMap()
         // Get the trajectory
         // trajectory_ = mpSLAM->GetAtlas()->GetAllKeyFrames();
         // Get the current pose
-        current_pose_ = mpSLAM->getCurrentTwC();
+        current_pose_ = mpSLAM->getCurrentTwC().inverse();
         R2 = current_pose_.unit_quaternion();
 
         // Refine the point cloud
@@ -115,12 +116,13 @@ void MapNode::GeneratingMap()
         odom_trans_.header.stamp = frame_timestamp;
         odom_trans_.header.frame_id = "odom";
         odom_trans_.child_frame_id = "base_link";
-        odom_trans_.transform.translation.x = static_cast<double>(-current_pose_.translation().z());
+        odom_trans_.transform.translation.x = static_cast<double>(current_pose_.translation().z());
         odom_trans_.transform.translation.y = static_cast<double>(-current_pose_.translation().x());
-        odom_trans_.transform.translation.z = static_cast<double>(current_pose_.translation().y());
-        odom_trans_.transform.rotation.x = static_cast<double>(R2.x());
-        odom_trans_.transform.rotation.y = static_cast<double>(R2.y());
-        odom_trans_.transform.rotation.z = static_cast<double>(R2.z());
+        odom_trans_.transform.translation.z = static_cast<double>(-current_pose_.translation().y());
+        odom_trans_.transform.translation.z = 0.0;
+        odom_trans_.transform.rotation.x = static_cast<double>(R2.z());
+        odom_trans_.transform.rotation.y = static_cast<double>(-R2.x());
+        odom_trans_.transform.rotation.z = static_cast<double>(-R2.y());
         odom_trans_.transform.rotation.w = static_cast<double>(R2.w());
 
         tf_broadcaster_.sendTransform(odom_trans_);        
@@ -129,14 +131,13 @@ void MapNode::GeneratingMap()
         odom_msg.header.frame_id = "odom";
         odom_msg.child_frame_id = "base_link";
         odom_msg.pose.pose.position.x = static_cast<double>(current_pose_.translation().z());
-        odom_msg.pose.pose.position.y = static_cast<double>(current_pose_.translation().x());
-        odom_msg.pose.pose.position.z = static_cast<double>(current_pose_.translation().y());
+        odom_msg.pose.pose.position.y = static_cast<double>(-current_pose_.translation().x());
+        odom_msg.pose.pose.position.z = static_cast<double>(-current_pose_.translation().y());
+        odom_msg.pose.pose.position.z = 0.0;
 
-        cout << "Moose Current Pose x: " << current_pose_.translation().z() << " y: " << current_pose_.translation().x() << " z: " << current_pose_.translation().y() << endl;
-        
         odom_msg.pose.pose.orientation.x = static_cast<double>(R2.z());
-        odom_msg.pose.pose.orientation.y = static_cast<double>(R2.y());
-        odom_msg.pose.pose.orientation.z = static_cast<double>(R2.x());
+        odom_msg.pose.pose.orientation.y = static_cast<double>(-R2.x());
+        odom_msg.pose.pose.orientation.z = static_cast<double>(-R2.y());
         odom_msg.pose.pose.orientation.w = static_cast<double>(R2.w());
         odom_msg.pose.covariance = {0.01, 0, 0, 0, 0, 0,
                         0, 0.01, 0, 0, 0, 0,
@@ -146,11 +147,11 @@ void MapNode::GeneratingMap()
                         0, 0, 0, 0, 0, 0.01};
 
         odom_msg.twist.twist.linear.x = static_cast<double>(current_pose_.translation().z() - prev_pose_.translation().z()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
-        odom_msg.twist.twist.linear.y = static_cast<double>(current_pose_.translation().y() - prev_pose_.translation().y()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
-        odom_msg.twist.twist.linear.z = static_cast<double>(current_pose_.translation().x() - prev_pose_.translation().x()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.linear.y = static_cast<double>((-current_pose_.translation().x()) - (-prev_pose_.translation().x())) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.linear.z = static_cast<double>((-current_pose_.translation().y()) - (-prev_pose_.translation().y())) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
         odom_msg.twist.twist.angular.x = static_cast<double>(current_pose_.unit_quaternion().z() - prev_pose_.unit_quaternion().z()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
-        odom_msg.twist.twist.angular.y = static_cast<double>(current_pose_.unit_quaternion().x() - prev_pose_.unit_quaternion().x()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
-        odom_msg.twist.twist.angular.z = static_cast<double>(current_pose_.unit_quaternion().y() - prev_pose_.unit_quaternion().y()) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.angular.y = static_cast<double>((-current_pose_.unit_quaternion().x()) - (-prev_pose_.unit_quaternion().x())) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
+        odom_msg.twist.twist.angular.z = static_cast<double>((-current_pose_.unit_quaternion().y()) - (-prev_pose_.unit_quaternion().y())) / (GetSeconds(frame_timestamp) - GetSeconds(prev_timestamp));
         odom_msg.twist.covariance = {0.01, 0, 0, 0, 0, 0,
                                      0, 0.01, 0, 0, 0, 0,
                                      0, 0, 0.01, 0, 0, 0,
