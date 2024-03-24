@@ -4,6 +4,8 @@
 #define RAW_MAP_POINT_TOPIC "/raw_map_points"
 #define REFINED_MAP_POINT_TOPIC "/refined_map_points"
 #define ODOM_TOPIC "/egocar/odom"
+#define RAW_COORDS 3
+#define REFINED_COORDS 2
 
 #include <iostream>
 #include <thread>
@@ -30,8 +32,9 @@ public:
     ~MapNode();
 
     void RunMapping(); // run everything else
-    void RefinePointCloud();
-    void OccupancyGrid();
+    void MapPointsPublish(rclcpp::Time frame_timestamp); // publish raw map points
+    void OdomPublish(rclcpp::Time frame_timestamp, rclcpp::Time prev_timestamp);
+    void RefinePointCloud(rclcpp::Time frame_timestamp);
     double GetSeconds(builtin_interfaces::msg::Time stamp);
 
 private:
@@ -51,7 +54,6 @@ private:
     // publishers
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr raw_map_points_pub_, refined_map_points_pub_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
-    // rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr occupancy_grid_pub_;
 
     tf2_ros::TransformBroadcaster tf_broadcaster_;
     geometry_msgs::msg::TransformStamped odom_trans_;
