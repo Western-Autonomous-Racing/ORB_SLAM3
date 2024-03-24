@@ -87,7 +87,8 @@ ORBextractor.minThFAST: 7
 #--------------------------------------------------------------------------------------------
 
 # System.LoadAtlasFromFile: "map_kitchen"
-System.SaveAtlasToFile: "map_aceb"
+# System.SaveAtlasToFile: "map_aceb"
+# System.SaveAtlasToROS: ""
 
 #--------------------------------------------------------------------------------------------
 # Viewer Parameters

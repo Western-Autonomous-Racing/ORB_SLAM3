@@ -57,8 +57,6 @@ StereoNode::StereoNode(ORB_SLAM3::System *pSLAM, const bool bRect, const bool bC
 
 StereoNode::~StereoNode()
 {
-  // Save camera trajectory
-  mpSLAM->SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
   // Stop all threads
   mpSLAM->Shutdown();
   
