@@ -145,33 +145,6 @@ void MapNode::RefinePointCloud(rclcpp::Time frame_timestamp)
     unsigned char *refined_map_points_data = &(refined_map_points_msg_.data[0]);
     float coords_array[RAW_COORDS];
 
-    // Remove the outliers
-
-    // First, anything below the ground plane
-    
-    for (int i = 0; i < refined_map_points_.size(); i++)
-    {
-        if ((-refined_map_points_.at(i)->GetWorldPos()(1)) < 0.25)
-        {
-            refined_map_points_.at(i) = nullptr;
-        } else {
-
-        }
-    }
-
-    // Remove anything above a certain height
-
-    for (int i =0; i < refined_map_points_.size(); i++)
-    {
-        if (refined_map_points_.at(i) == nullptr)
-            continue;
-
-        if ((-refined_map_points_.at(i)->GetWorldPos()(1)) > 4.0 )
-        {
-            refined_map_points_.at(i) = nullptr;
-        }
-    }
-
     // Remove all nullptr elements from the vector
     refined_map_points_.erase(std::remove(refined_map_points_.begin(), refined_map_points_.end(), nullptr), refined_map_points_.end());
 
@@ -184,10 +157,20 @@ void MapNode::RefinePointCloud(rclcpp::Time frame_timestamp)
 
         coords_array[0] = refined_map_points_.at(i)->GetWorldPos()(2);
         coords_array[1] = -refined_map_points_.at(i)->GetWorldPos()(0);
-        coords_array[2] = -refined_map_points_.at(i)->GetWorldPos()(1);
+        coords_array[2] = -refined_map_points_.at(i)->GetWorldPos()(1) - (refined_map_points_.at(i)->GetWorldPos()(2) * tan(cloud_transform_z_));
+
+        // Remove the outliers
+        if (coords_array[2] < 0.25 || coords_array[2] > 4.5)
+        {
+            refined_map_points_.at(i) = nullptr;
+            continue;
+        }
 
         memcpy(refined_map_points_data + i * refined_map_points_msg_.point_step, coords_array, RAW_COORDS * sizeof(float));
     }
+
+    // Remove all nullptr elements from the vector
+    refined_map_points_.erase(std::remove(refined_map_points_.begin(), refined_map_points_.end(), nullptr), refined_map_points_.end());
 
 
 }
