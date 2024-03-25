@@ -1,12 +1,26 @@
 #include "../include/map_node.hpp"
 #include <opencv2/core.hpp>
+#include <cmath>
 
 using namespace std;
 using std::placeholders::_1;
 
-MapNode::MapNode(ORB_SLAM3::System *pSLAM)
+MapNode::MapNode(ORB_SLAM3::System *pSLAM, string config)
     : Node("map_node"), mpSLAM(pSLAM), tf_broadcaster_(this)
 {
+    
+    cv::FileStorage fsSettings(config.c_str(), cv::FileStorage::READ);
+
+    cv::FileNode node = fsSettings["System.CloudTransformZ"];
+
+    if (!node.empty())
+    {
+        cloud_transform_z_ = static_cast<double>(node);
+    }
+    else
+    {
+        cloud_transform_z_ = 0.0;
+    }
 
     raw_map_points_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>(RAW_MAP_POINT_TOPIC, 100);
     odom_pub_ = this->create_publisher<nav_msgs::msg::Odometry>(ODOM_TOPIC, 100);
@@ -90,7 +104,7 @@ void MapNode::MapPointsPublish(rclcpp::Time frame_timestamp)
 
             coords_array[0] = raw_map_points_.at(i)->GetWorldPos()(2);
             coords_array[1] = -raw_map_points_.at(i)->GetWorldPos()(0);
-            coords_array[2] = -raw_map_points_.at(i)->GetWorldPos()(1);
+            coords_array[2] = -raw_map_points_.at(i)->GetWorldPos()(1) - (raw_map_points_.at(i)->GetWorldPos()(2) * tan(cloud_transform_z_));
 
             memcpy(raw_map_points_data + i * raw_map_points_msg_.point_step, coords_array, RAW_COORDS * sizeof(float));
         }
@@ -152,7 +166,7 @@ void MapNode::RefinePointCloud(rclcpp::Time frame_timestamp)
         if (refined_map_points_.at(i) == nullptr)
             continue;
 
-        if ((-refined_map_points_.at(i)->GetWorldPos()(1)) > 2.5 )
+        if ((-refined_map_points_.at(i)->GetWorldPos()(1)) > 4.0 )
         {
             refined_map_points_.at(i) = nullptr;
         }

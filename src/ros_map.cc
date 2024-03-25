@@ -34,7 +34,7 @@ int main(int argc, char **argv)
         executor.add_node(mono_inertial_node);
 
         cout << "Running Mapping..." << endl;
-        auto map_node = std::make_shared<MapNode>(&SLAM);
+        auto map_node = std::make_shared<MapNode>(&SLAM, argv[3]);
         executor.add_node(map_node);
 
         executor.spin();
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
         executor.add_node(stereo_node);
 
         cout << "Running Mapping..." << endl;
-        auto map_node = std::make_shared<MapNode>(&SLAM);
+        auto map_node = std::make_shared<MapNode>(&SLAM, argv[3]);
         executor.add_node(map_node);
 
         executor.spin();
@@ -90,7 +90,7 @@ int main(int argc, char **argv)
         auto stereo_inertial_node = std::make_shared<StereoInertialNode>(&SLAM, sbRect == "true", bEqual, argv[3]);
         executor.add_node(stereo_inertial_node);
         cout << "Running Mapping..." << endl;
-        auto map_node = std::make_shared<MapNode>(&SLAM);
+        auto map_node = std::make_shared<MapNode>(&SLAM, argv[3]);
         executor.add_node(map_node);
 
         executor.spin();
