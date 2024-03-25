@@ -28,7 +28,7 @@ class MapNode : public rclcpp::Node
 {
 public:
 
-    MapNode(ORB_SLAM3::System *pSLAM); // Constructor - gets SLAM system pointer
+    MapNode(ORB_SLAM3::System *pSLAM, string config); // Constructor - gets SLAM system pointer
     ~MapNode();
 
     void RunMapping(); // run everything else
@@ -70,6 +70,7 @@ private:
     sensor_msgs::msg::PointCloud2 raw_map_points_msg_, refined_map_points_msg_;
     nav_msgs::msg::Odometry odom_msg_;
 
+    double cloud_transform_z_;
 };
 
 
