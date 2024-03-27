@@ -73,20 +73,20 @@ ORBextractor.nFeatures: 1250
 ORBextractor.scaleFactor: 1.2
 
 # ORB Extractor: Number of levels in the scale pyramid
-ORBextractor.nLevels: 8
+ORBextractor.nLevels: 10
 
 # ORB Extractor: Fast threshold
 # Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
 # Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
 # You can lower these values if your images have low contrast 
-ORBextractor.iniThFAST: 14 # 20
+ORBextractor.iniThFAST: 12 # 20
 ORBextractor.minThFAST: 3 # 7
 
 #--------------------------------------------------------------------------------------------
 # Atlas Parameters
 #--------------------------------------------------------------------------------------------
 
-System.LoadAtlasFromFile: "map_aceb_third"
+# System.LoadAtlasFromFile: "map_aceb_third"
 System.SaveAtlasToFile: "map_aceb_third"
 # System.SaveAtlasToROS: ""
 System.CloudTransformZ: 0.0279253 # rads
