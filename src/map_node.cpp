@@ -8,18 +8,48 @@ using std::placeholders::_1;
 MapNode::MapNode(ORB_SLAM3::System *pSLAM, string config)
     : Node("map_node"), mpSLAM(pSLAM), tf_broadcaster_(this)
 {
-    
+
     cv::FileStorage fsSettings(config.c_str(), cv::FileStorage::READ);
 
-    cv::FileNode node = fsSettings["System.CloudTransformZ"];
+    cv::FileNode cloud_transform_node = fsSettings["System.CloudTransformZ"];
+    cv::FileNode upper_bound_node = fsSettings["System.UpperBounds"];
+    cv::FileNode lower_bound_node = fsSettings["System.LowerBounds"];
+    cv::FileNode publish_last_node = fsSettings["System.PublishLast"];
 
-    if (!node.empty())
+    if (!cloud_transform_node.empty())
     {
-        cloud_transform_z_ = static_cast<double>(node);
+        cloud_transform_z_ = static_cast<double>(cloud_transform_node);
     }
     else
     {
         cloud_transform_z_ = 0.0;
+    }
+
+    if (!upper_bound_node.empty())
+    {
+        upper_bound_ = static_cast<double>(upper_bound_node);
+    }
+    else
+    {
+        upper_bound_ = UPPER_BOUND_DEFAULT;
+    }
+
+    if (!lower_bound_node.empty())
+    {
+        lower_bound_ = static_cast<double>(lower_bound_node);
+    }
+    else
+    {
+        lower_bound_ = LOWER_BOUND_DEFAULT;
+    }
+
+    if (!publish_last_node.empty())
+    {
+        publish_last_ = static_cast<int>(publish_last_node);
+    }
+    else
+    {
+        publish_last_ = 1;
     }
 
     raw_map_points_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>(RAW_MAP_POINT_TOPIC, 100);
@@ -31,6 +61,10 @@ MapNode::MapNode(ORB_SLAM3::System *pSLAM, string config)
 
 MapNode::~MapNode()
 {
+    if (publish_last_) {
+        raw_map_points_pub_->publish(raw_map_points_msg_);
+        refined_map_points_pub_->publish(refined_map_points_msg_);
+    }
     publishing_thread_->join();
     delete publishing_thread_;
     // Stop all
@@ -110,9 +144,11 @@ void MapNode::MapPointsPublish(rclcpp::Time frame_timestamp)
         }
 
         RefinePointCloud(frame_timestamp);
-
-        raw_map_points_pub_->publish(raw_map_points_msg_);
-        refined_map_points_pub_->publish(refined_map_points_msg_);
+        if (publish_last_)
+        {
+            raw_map_points_pub_->publish(raw_map_points_msg_);
+            refined_map_points_pub_->publish(refined_map_points_msg_);
+        }
     }
 }
 
@@ -120,9 +156,9 @@ void MapNode::MapPointsPublish(rclcpp::Time frame_timestamp)
 void MapNode::RefinePointCloud(rclcpp::Time frame_timestamp)
 {
     // Copy the raw map points to the refined map points
-    
+
     refined_map_points_ = raw_map_points_;
-;
+    ;
     refined_map_points_msg_.header.frame_id = "odom"; // "map"
     refined_map_points_msg_.header.stamp = frame_timestamp;
     refined_map_points_msg_.height = 1;
@@ -160,7 +196,7 @@ void MapNode::RefinePointCloud(rclcpp::Time frame_timestamp)
         coords_array[2] = -refined_map_points_.at(i)->GetWorldPos()(1) - (refined_map_points_.at(i)->GetWorldPos()(2) * tan(cloud_transform_z_));
 
         // Remove the outliers
-        if (coords_array[2] < 0.25 || coords_array[2] > 4.5)
+        if (coords_array[2] < lower_bound_ || coords_array[2] > upper_bound_)
         {
             refined_map_points_.at(i) = nullptr;
             continue;
@@ -171,8 +207,6 @@ void MapNode::RefinePointCloud(rclcpp::Time frame_timestamp)
 
     // Remove all nullptr elements from the vector
     refined_map_points_.erase(std::remove(refined_map_points_.begin(), refined_map_points_.end(), nullptr), refined_map_points_.end());
-
-
 }
 
 void MapNode::OdomPublish(rclcpp::Time frame_timestamp, rclcpp::Time prev_timestamp)
@@ -239,6 +273,6 @@ void MapNode::OdomPublish(rclcpp::Time frame_timestamp, rclcpp::Time prev_timest
                                   0, 0, 0, 0.01, 0, 0,
                                   0, 0, 0, 0, 0.01, 0,
                                   0, 0, 0, 0, 0, 0.01};
-
-    odom_pub_->publish(odom_msg_);    
+    if (publish_last_)
+        odom_pub_->publish(odom_msg_);
 }
