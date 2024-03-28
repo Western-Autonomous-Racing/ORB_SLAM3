@@ -15,7 +15,7 @@ fi
 # of session is empty provide default topics
 if [ -z "$topics" ]
 then
-  topics="/raw_map_points /egocar/odom"
+  topics="/raw_map_points /egocar/odom /refined_map_points"
 fi
 
 splitsize=10000000000
