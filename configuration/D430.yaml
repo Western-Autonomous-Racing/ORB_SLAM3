@@ -86,10 +86,13 @@ ORBextractor.minThFAST: 3 # 7
 # Atlas Parameters
 #--------------------------------------------------------------------------------------------
 
-# System.LoadAtlasFromFile: "map_aceb_third"
-System.SaveAtlasToFile: "map_aceb_third"
+System.LoadAtlasFromFile: "map_aceb_second_mega"
+System.SaveAtlasToFile: "map_aceb_baseline"
 # System.SaveAtlasToROS: ""
 System.CloudTransformZ: 0.0279253 # rads
+System.UpperBounds: 4.5 # metres
+System.LowerBounds: -0.1 # metres
+System.PublishCloudLast: 0 # 0: Record last frame 1: record continuously throughout mapping session
 
 #--------------------------------------------------------------------------------------------
 # Viewer Parameters
