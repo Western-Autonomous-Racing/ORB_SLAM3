@@ -14,7 +14,6 @@ MapNode::MapNode(ORB_SLAM3::System *pSLAM, string config)
     cv::FileNode cloud_transform_node = fsSettings["System.CloudTransformZ"];
     cv::FileNode upper_bound_node = fsSettings["System.UpperBounds"];
     cv::FileNode lower_bound_node = fsSettings["System.LowerBounds"];
-    cv::FileNode publish_last_node = fsSettings["System.PublishLast"];
 
     if (!cloud_transform_node.empty())
     {
@@ -43,15 +42,6 @@ MapNode::MapNode(ORB_SLAM3::System *pSLAM, string config)
         lower_bound_ = LOWER_BOUND_DEFAULT;
     }
 
-    if (!publish_last_node.empty())
-    {
-        publish_last_ = static_cast<int>(publish_last_node);
-    }
-    else
-    {
-        publish_last_ = 1;
-    }
-
     raw_map_points_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>(RAW_MAP_POINT_TOPIC, 100);
     odom_pub_ = this->create_publisher<nav_msgs::msg::Odometry>(ODOM_TOPIC, 100);
     refined_map_points_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>(REFINED_MAP_POINT_TOPIC, 100);
@@ -61,17 +51,11 @@ MapNode::MapNode(ORB_SLAM3::System *pSLAM, string config)
 
 MapNode::~MapNode()
 {
-    if (publish_last_) {
-        raw_map_points_pub_->publish(raw_map_points_msg_);
-        refined_map_points_pub_->publish(refined_map_points_msg_);
-    }
     publishing_thread_->join();
     delete publishing_thread_;
     // Stop all
 }
 
-// Map points -> GetAllMapPoints() (Atlas.h/Map.h)
-// Trajectory -> GetAllKeyFrames() (Atlas.h/Map.h)
 // Get Current Pose() -> TrackStereo(), etc. (System.h) (Tcw)
 void MapNode::RunMapping()
 {
@@ -144,12 +128,10 @@ void MapNode::MapPointsPublish(rclcpp::Time frame_timestamp)
         }
 
         RefinePointCloud(frame_timestamp);
-        if (publish_last_)
-        {
-            raw_map_points_pub_->publish(raw_map_points_msg_);
-            refined_map_points_pub_->publish(refined_map_points_msg_);
-        }
-    }
+
+        raw_map_points_pub_->publish(raw_map_points_msg_);
+        refined_map_points_pub_->publish(refined_map_points_msg_);
+}
 }
 
 // void RefinePointCloud();
@@ -273,6 +255,5 @@ void MapNode::OdomPublish(rclcpp::Time frame_timestamp, rclcpp::Time prev_timest
                                   0, 0, 0, 0.01, 0, 0,
                                   0, 0, 0, 0, 0.01, 0,
                                   0, 0, 0, 0, 0, 0.01};
-    if (publish_last_)
-        odom_pub_->publish(odom_msg_);
+    odom_pub_->publish(odom_msg_);
 }
