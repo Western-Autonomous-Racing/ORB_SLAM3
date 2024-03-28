@@ -6,6 +6,8 @@
 #define ODOM_TOPIC "/egocar/odom"
 #define RAW_COORDS 3
 #define REFINED_COORDS 2
+#define UPPER_BOUND_DEFAULT 4.5
+#define LOWER_BOUND_DEFAULT 0.0
 
 #include <iostream>
 #include <thread>
@@ -39,7 +41,6 @@ public:
 
 private:
 
-
     ORB_SLAM3::System *mpSLAM; // Pointer to the SLAM system
 
     // Cloud point maps
@@ -70,7 +71,7 @@ private:
     sensor_msgs::msg::PointCloud2 raw_map_points_msg_, refined_map_points_msg_;
     nav_msgs::msg::Odometry odom_msg_;
 
-    double cloud_transform_z_;
+    double cloud_transform_z_, upper_bound_, lower_bound_;
 };
 
 
