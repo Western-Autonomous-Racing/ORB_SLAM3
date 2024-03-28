@@ -41,7 +41,6 @@ public:
 
 private:
 
-
     ORB_SLAM3::System *mpSLAM; // Pointer to the SLAM system
 
     // Cloud point maps
@@ -73,7 +72,6 @@ private:
     nav_msgs::msg::Odometry odom_msg_;
 
     double cloud_transform_z_, upper_bound_, lower_bound_;
-    int publish_last_;
 };
 
 
