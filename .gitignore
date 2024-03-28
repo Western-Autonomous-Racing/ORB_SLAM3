@@ -105,3 +105,7 @@ log/
 atlases
 build_logs
 maps
+
+*.db3
+*tar.xz
+test_data/
