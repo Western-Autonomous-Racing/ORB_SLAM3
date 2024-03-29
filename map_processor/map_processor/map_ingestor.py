@@ -15,11 +15,11 @@ class MapProcessor(Node):
         self.declare_parameter("clustered_map_topic", "/clustered_map_points")
         self.declare_parameter("timeout", 5)
         self.declare_parameter("min_z", 0.0)
-        self.declare_parameter("max_z", 4.0)
+        self.declare_parameter("max_z", 2.2)
         self.declare_parameter("min_cluster_size", 25)
         self.declare_parameter("min_samples", 3)
-        self.declare_parameter("cluster_selection_epsilon", 0.5)
-        self.declare_parameter("alpha", 1.3)
+        self.declare_parameter("cluster_selection_epsilon", 0.8)
+        self.declare_parameter("alpha", 1.0)
 
 
         if self.has_parameter("raw_map_topic"):
@@ -109,7 +109,7 @@ class MapProcessor(Node):
         self.clustered_pub_2D_.publish(clustered_msg2d)
     
     def cluster_points(self, points: np.ndarray) -> np.ndarray:
-        clusterer = hdbscan.HDBSCAN(min_cluster_size=self.min_cluster_size, min_samples=self.min_samples) #, cluster_selection_epsilon=self.cluster_selection_epsilon, alpha=self.alpha)
+        clusterer = hdbscan.HDBSCAN(min_cluster_size=self.min_cluster_size, min_samples=self.min_samples, cluster_selection_epsilon=self.cluster_selection_epsilon, alpha=self.alpha)
         cluster_labels = clusterer.fit_predict(points)
         return cluster_labels
 
