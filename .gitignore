@@ -67,6 +67,7 @@ Thirdparty/g2o/lib/
 Vocabulary/ORBvoc.txt
 ORBvoc.txt
 orbslam3_ros2/ORB_SLAM3/Vocabulary/ORBvoc.txt
+Examples/ROS/ORB_SLAM3/ORBvoc.txt
 build/
 
 lib/
