@@ -4,7 +4,7 @@
   <name>orbslam3_ros2</name>
   <version>1.0.0</version>
   <description>ROS2 wrapper for ORB_SLAM3 library</description>
-  <maintainer email="dxie33@uwo.ca">Daniel Xie</maintainer>
+  <maintainer email="danxie2001@gmail.com">Daniel Xie</maintainer>
   <license>MIT</license>
   <author>Daniel Xie</author>
 
@@ -19,8 +19,12 @@
   <depend>tf2_ros</depend>
   <depend>tf2_geometry_msgs</depend>
   <depend>Pangolin</depend>
+  <depend>map_processor</depend>
+  <depend>pointcloud_to_laserscan</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
+    <build_type>ament_python</build_type>
   </export>
+
 </package>
