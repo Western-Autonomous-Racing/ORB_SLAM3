@@ -4,7 +4,7 @@ project(orbslam3_ros2)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# add_definitions(-Wno-deprecated-declarations)
+add_definitions(-Wno-deprecated-declarations)
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -110,7 +110,12 @@ install(TARGETS
    stereo_inertial
    stereo
    map
+   
    DESTINATION lib/${PROJECT_NAME}
+)
+
+install (DIRECTORY launch
+   DESTINATION share/${PROJECT_NAME}
 )
 
 ament_package()
