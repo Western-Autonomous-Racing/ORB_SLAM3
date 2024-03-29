@@ -45,7 +45,20 @@ def generate_launch_description():
         name='pointcloud_to_laserscan',
         remappings=[('cloud_in', '/refined_map_2D'),
                     ('scan','/scan')],
-        parameters=[LaunchConfiguration('map_config')],
+        parameters=[{
+                'target_frame': 'base_link',
+                'transform_tolerance': 0.01,
+                'min_height': -0.5,
+                'max_height': 0.5,
+                'angle_min': -1.5708,  # -M_PI/2
+                'angle_max': 1.5708,  # M_PI/2
+                'angle_increment': 0.0087,  # M_PI/360.0
+                'scan_time': 0.03333,
+                'range_min': 0.0,
+                'range_max': 100.0,
+                'use_inf': False,
+                'inf_epsilon': 1.0
+            }]
     )
 
     orbslam3_run_node = Node(
