@@ -1,6 +1,6 @@
 echo "Configuring and building Thirdparty/DBoW2 ..."
 
-cd ORB_SLAM3/Thirdparty/DBoW2
+cd orbslam3_ros2/ORB_SLAM3/Thirdparty/DBoW2
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release

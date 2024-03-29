@@ -18,6 +18,8 @@ find_package(Eigen3 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Pangolin REQUIRED)
 
+message(STATUS "Project source dir: ${PROJECT_SOURCE_DIR}")
+
 include_directories(
    ${PROJECT_SOURCE_DIR}
    ${PROJECT_SOURCE_DIR}/ORB_SLAM3
@@ -89,6 +91,7 @@ ament_target_dependencies(map
    tf2_ros
 )
 
+
 target_link_libraries(mono_inertial
    ${LIBS}
 )
@@ -109,13 +112,14 @@ install(TARGETS
    mono_inertial
    stereo_inertial
    stereo
-   map
-   
+   map_node
    DESTINATION lib/${PROJECT_NAME}
 )
 
-install (DIRECTORY launch
+install(DIRECTORY
+   launch
    DESTINATION share/${PROJECT_NAME}
 )
+
 
 ament_package()
