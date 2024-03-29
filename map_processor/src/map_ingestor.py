@@ -31,8 +31,6 @@ class MapReceiver(Node):
         if self.has_parameter("min_cluster_size"):
             self.min_cluster_size = self.get_parameter("min_cluster_size").value
 
-        
-
         self.raw_points = np.array([])
         self.refined_points = np.array([])     
 
@@ -45,7 +43,7 @@ class MapReceiver(Node):
         # Create a timer that fires every second and checks if a message has been received
         # self.timer = self.create_timer(1.0, self.check_timeout)
 
-        self.publish_cluster = self.create_timer(0.02, self.publish_clustered_map)
+        self.publish_cluster_callback = self.create_timer(0.02, self.publish_clustered_map)
 
     def callback_raw(self, msg: PointCloud2):    
         self.raw_points = self.pc2_to_np_arr(msg)   
@@ -69,10 +67,9 @@ class MapReceiver(Node):
     def publish_clustered_map(self):
         if len(self.refined_points) > 0:
             cluster_labels = self.cluster_points(self.refined_points)
-            clustered_points = self.refined_points[cluster_labels != -1]
-            print(clustered_points.shape)
-            # clustered_msg = self.define_cluster_msg(clustered_points)
-            # self.clustered_pub_.publish(clustered_msg)
+            clustered_points = np.concatenate((self.refined_points, np.float32(cluster_labels.reshape(-1, 1))), axis=1)
+            clustered_msg = self.define_cluster_msg(clustered_points)
+            self.clustered_pub_.publish(clustered_msg)
     
     def cluster_points(self, points: np.ndarray) -> np.ndarray:
         clusterer = hdbscan.HDBSCAN(min_cluster_size=10)
@@ -83,14 +80,16 @@ class MapReceiver(Node):
 
     def define_cluster_msg(self, points: np.ndarray) -> PointCloud2:
         
-        point_cloud = pc2.create_cloud_xyz32(header=Header(), points=points)
+        fields = [
+            PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
+            PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
+            PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
+            PointField(name='intensity', offset=12, datatype=PointField.FLOAT32, count=1)
+        ]
+        point_cloud = pc2.create_cloud(header=Header(), fields=fields, points=points)
         point_cloud.header.frame_id = "map"
         point_cloud.header.stamp = self.get_clock().now().to_msg()
-        fields =[PointField('x', 0, PointField.FLOAT32, 1),
-                PointField('y', 4, PointField.FLOAT32, 1),
-                PointField('z', 8, PointField.FLOAT32, 1),
-                PointField('intensity', 12, PointField.FLOAT32,1),
-        ]
+        
 
         point_cloud.fields = fields
 
@@ -105,6 +104,14 @@ class MapReceiver(Node):
         point_cloud.is_dense = True
 
         return point_cloud    
+
+
+    def publish_clustered_map(self):
+        if len(self.refined_points) > 0:
+            cluster_labels = self.cluster_points(self.refined_points)
+            clustered_points = np.concatenate((self.refined_points, np.float32(cluster_labels.reshape(-1, 1))), axis=1)
+            clustered_msg = self.define_cluster_msg(clustered_points)
+            self.clustered_pub_.publish(clustered_msg)
 
     def check_timeout(self):
         # Check if the time since the last received message is greater than the timeout
