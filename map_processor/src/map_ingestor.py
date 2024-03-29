@@ -105,14 +105,6 @@ class MapReceiver(Node):
 
         return point_cloud    
 
-
-    def publish_clustered_map(self):
-        if len(self.refined_points) > 0:
-            cluster_labels = self.cluster_points(self.refined_points)
-            clustered_points = np.concatenate((self.refined_points, np.float32(cluster_labels.reshape(-1, 1))), axis=1)
-            clustered_msg = self.define_cluster_msg(clustered_points)
-            self.clustered_pub_.publish(clustered_msg)
-
     def check_timeout(self):
         # Check if the time since the last received message is greater than the timeout
         # if (self.get_clock().now() - self.last_received_time).seconds > self.timeout:
