@@ -21,4 +21,9 @@ setup(
     maintainer_email='danxie2001@gmail.com',
     description='Map Processing Node',
     license='MIT',
+    entry_points={
+        'console_scripts': [
+            'map_processor = map_processor.map_processor:main'
+        ],
+    },
 )

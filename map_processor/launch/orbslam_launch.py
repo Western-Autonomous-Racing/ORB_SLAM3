@@ -28,14 +28,14 @@ def generate_launch_description():
         parameters=[LaunchConfiguration('map_config')]
     )
 
-    tf2_ros_node =  Node(
+    tf2_ros_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='static_transform_publisher',
         arguments=[
-            '--x', '0', '--y', '0', '--z', '0',
-            '--qx', '0', '--qy', '0', '--qz', '0', '--qw', '1',
-            '--frame-id', 'odom', '--child-frame-id', 'base_link'
+            '0', '0', '0',
+            '0', '0', '0', '1',
+            'odom', 'base_link'
         ]
     )
 
@@ -43,8 +43,8 @@ def generate_launch_description():
         package='pointcloud_to_laserscan',
         executable='pointcloud_to_laserscan_node',
         name='pointcloud_to_laserscan',
-        remappings=[('cloud_in', [LaunchConfiguration(variable_name='scanner'), '/refined_map_2D']),
-                    ('scan', [LaunchConfiguration(variable_name='scanner'), '/scan'])],
+        remappings=[('cloud_in', '/refined_map_2D'),
+                    ('scan','/scan')],
         parameters=[LaunchConfiguration('map_config')],
     )
 
@@ -54,11 +54,11 @@ def generate_launch_description():
         name='orbslam3_run',
         arguments=[
             'stereo',
-            'src/ORB_SLAM3/Vocabulary/ORBvoc.txt',
-            'src/ORB_SLAM3/configuration/D430.yaml',
+            '/home/formatspecifier/Projects/orbslam3_ws/src/ORB_SLAM3/orbslam3_ros2/ORB_SLAM3/Vocabulary/ORBvoc.txt',
+            '/home/formatspecifier/Projects/orbslam3_ws/src/ORB_SLAM3/configuration/D430.yaml',
             'false',
             'true'
-        ]
+        ],
     )
 
     ld.add_action(orbslam3_run_node)

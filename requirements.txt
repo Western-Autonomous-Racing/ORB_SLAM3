@@ -1,1 +1,4 @@
 numpy
+hdbscan
+scikit-learn
+matplotlib

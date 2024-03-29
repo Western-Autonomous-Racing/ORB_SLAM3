@@ -2,11 +2,22 @@
 #include "../include/stereo_inertial_node.hpp"
 #include "../include/mono_inertial_node.hpp"
 #include "../include/stereo_node.hpp"
+#include <signal.h>
+#include <stdlib.h>
+
 
 using namespace std;
 
+void handler(int sig) {
+  rclcpp::shutdown();
+  exit(0);
+}
+
 int main(int argc, char **argv)
 {
+    signal(SIGINT, handler);
+    signal(SIGSEGV, handler);
+
     rclcpp::init(argc, argv);
     bool bEqual = false;
 
@@ -14,7 +25,7 @@ int main(int argc, char **argv)
 
     if (strcmp(argv[1], "mono") == 0)
     {
-        if (argc == 5)
+        if (argc == 5 || (argc == 8 && strcmp(argv[5], "--ros-args")) == 0)
         {
             std::string sbEqual(argv[4]);
             if (sbEqual == "true")
@@ -23,7 +34,7 @@ int main(int argc, char **argv)
         else
         {
             cerr << endl
-                 << "Usage: ros2 run ORB_SLAM3 map_node node_type path_to_vocabulary path_to_settings [do_equalize]" << endl;
+                 << "Usage: ros2 run orbslam3_ros2 map node_type path_to_vocabulary path_to_settings [do_equalize]" << endl;
             rclcpp::shutdown();
             return 1;
         }
@@ -44,7 +55,7 @@ int main(int argc, char **argv)
     }
     else if (strcmp(argv[1], "stereo") == 0)
     {
-        if (argc == 6)
+        if (argc == 6 || (argc == 9 && strcmp(argv[6], "--ros-args") == 0))
         {
             std::string sbEqual(argv[4]);
             if (sbEqual == "true")
@@ -52,8 +63,17 @@ int main(int argc, char **argv)
         }
         else
         {
+            cerr << argv[6] << endl;
             cerr << endl
-                 << "Usage: ros2 run ORB_SLAM3 map_node node_type path_to_vocabulary path_to_settings do_rectify [do_equalize]" << endl;
+                 << "Usage: ros2 run orbslam3_ros2 map node_type path_to_vocabulary path_to_settings do_rectify [do_equalize]" << endl;
+
+            cerr << "You entered: " << endl; 
+            
+            for (int i = 0; i < argc; i++)
+            {
+                cerr << argv[i] << " ";
+            }
+            cerr << endl << "argc: " << argc << endl;
             rclcpp::shutdown();
             return 1;
         }
@@ -72,7 +92,7 @@ int main(int argc, char **argv)
     }
     else if (strcmp(argv[1], "stereo_inertial") == 0)
     {
-        if (argc == 6)
+        if (argc == 6 || (argc == 9 && strcmp(argv[6], "--ros-args")) == 0)
         {
             std::string sbEqual(argv[4]);
             if (sbEqual == "true")
@@ -81,10 +101,11 @@ int main(int argc, char **argv)
         else
         {
             cerr << endl
-                 << "Usage: ros2 run ORB_SLAM3 map_node node_type path_to_vocabulary path_to_settings do_rectify [do_equalize]" << endl;
+                 << "Usage: ros2 run orbslam3_ros2 map node_type path_to_vocabulary path_to_settings [do_equalize]" << endl;
             rclcpp::shutdown();
             return 1;
         }
+
         std::string sbRect(argv[4]);
         ORB_SLAM3::System SLAM(argv[2], argv[3], ORB_SLAM3::System::IMU_STEREO, true);
         auto stereo_inertial_node = std::make_shared<StereoInertialNode>(&SLAM, sbRect == "true", bEqual, argv[3]);

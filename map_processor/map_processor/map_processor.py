@@ -102,6 +102,9 @@ class MapProcessor(Node):
 
     def publish_clustered_map2d(self):
         # cluster points initially in 2D
+        if self.raw_points_.size == 0:
+            return
+        
         raw_2d = self.clip_points(self.raw_points_)
         raw_2d[:, 2] = 0.0
         # raw_2d = np.concatenate((raw_2d, np.zeros((raw_2d.shape[0], 1))), axis=1)

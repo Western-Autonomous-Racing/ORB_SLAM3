@@ -22,10 +22,10 @@ message(STATUS "Project source dir: ${PROJECT_SOURCE_DIR}")
 
 include_directories(
    ${PROJECT_SOURCE_DIR}
-   ${PROJECT_SOURCE_DIR}/ORB_SLAM3/orbslam3_ros2
-   ${PROJECT_SOURCE_DIR}/ORB_SLAM3/orbslam3_ros2/include
-   ${PROJECT_SOURCE_DIR}/ORB_SLAM3/orbslam3_ros2/include/CameraModels
-   ${PROJECT_SOURCE_DIR}/ORB_SLAM3/orbslam3_ros2/Thirdparty/Sophus
+   ${PROJECT_SOURCE_DIR}/ORB_SLAM3
+   ${PROJECT_SOURCE_DIR}/ORB_SLAM3/include
+   ${PROJECT_SOURCE_DIR}/ORB_SLAM3/include/CameraModels
+   ${PROJECT_SOURCE_DIR}/ORB_SLAM3/Thirdparty/Sophus
    ${Pangolin_INCLUDE_DIRS}
 )
 
@@ -33,9 +33,9 @@ set(LIBS
    ${OpenCV_LIBS} 
    ${EIGEN3_LIBS}
    ${Pangolin_LIBRARIES}
-   ${PROJECT_SOURCE_DIR}/ORB_SLAM3/orbslam3_ros2/Thirdparty/DBoW2/lib/libDBoW2.so
-   ${PROJECT_SOURCE_DIR}/ORB_SLAM3/orbslam3_ros2/Thirdparty/g2o/lib/libg2o.so
-   ${PROJECT_SOURCE_DIR}/ORB_SLAM3/orbslam3_ros2/lib/libORB_SLAM3.so
+   ${PROJECT_SOURCE_DIR}/ORB_SLAM3/Thirdparty/DBoW2/lib/libDBoW2.so
+   ${PROJECT_SOURCE_DIR}/ORB_SLAM3/Thirdparty/g2o/lib/libg2o.so
+   ${PROJECT_SOURCE_DIR}/ORB_SLAM3/lib/libORB_SLAM3.so
    -lboost_system
 )
 

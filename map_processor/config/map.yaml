@@ -1,5 +1,5 @@
 map_processor:
-  ros_parameters:    
+  ros__parameters:    
     raw_map_topic: "/raw_map_points"
     refined_map_topic: "/refined_map_2D"
     timeout: 5
@@ -10,4 +10,16 @@ map_processor:
     cluster_selection_epsilon: 0.8
     alpha: 1.0
 
-# pointcloud_to_laser:
+pointcloud_to_laserscan_node:
+  ros__parameters:
+    target_frame: "odom"
+    transform_tolerance: 0.01
+    min_height: -0.5
+    max_height: 0.5
+    angle_min: -1.5708
+    angle_max: 1.5708
+    angle_increment: 0.0087
+    scan_time: 0.3333
+    range_min: -100.0
+    range_max: 100.0
+    use_inf: false
