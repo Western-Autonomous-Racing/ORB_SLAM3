@@ -51,10 +51,13 @@ class MapProcessor(Node):
 
         self.raw_points = np.array([])
         self.processed_points = np.array([])     
+        self.processed_points_2d = np.array([])
+        self.combined_processed_points = np.array([])
 
         self.raw_map_sub_ = self.create_subscription(PointCloud2, self.raw_map_topic, self.callback_raw, 10) 
-        self.clustered_pub_ = self.create_publisher(PointCloud2, "/clustered_map", 10)
+        self.clustered_pub_ = self.create_publisher(PointCloud2, self.clustered_map_topic, 10)
         self.clustered_pub_2D_ = self.create_publisher(PointCloud2, "/clustered_map_2D", 10)
+        self.combined_clustered_pub_ = self.create_publisher(PointCloud2, "/combined_clustered_map", 10)
         
         self.last_received_time = self.get_clock().now()
 
@@ -63,6 +66,7 @@ class MapProcessor(Node):
 
         self.publish_cluster_callback = self.create_timer(0.005, self.publish_clustered_map)
         self.publish_cluster_callback2d = self.create_timer(0.005, self.publish_clustered_map2d)
+        self.publish_combined_cluster_callback = self.create_timer(0.005, self.publish_combined_clustered_map)
 
     def callback_raw(self, msg: PointCloud2):    
         self.raw_points = self.pc2_to_np_arr(msg)    
@@ -98,15 +102,23 @@ class MapProcessor(Node):
     def publish_clustered_map2d(self):
         # cluster points initially in 2D
         raw_2d = self.clip_points(self.raw_points)
-        raw_2d = raw_2d[:, :2]
-        raw_2d = np.concatenate((raw_2d, np.zeros((raw_2d.shape[0], 1))), axis=1)
+        raw_2d[:, 2] = 0.0
+        # raw_2d = np.concatenate((raw_2d, np.zeros((raw_2d.shape[0], 1))), axis=1)
         
         cluster_labels = self.cluster_points(raw_2d)
         cluster_labels = np.float32(cluster_labels.reshape(-1, 1))
-        processed_2d = np.concatenate((raw_2d, cluster_labels), axis=1)
-        processed_2d = processed_2d[processed_2d[:,3] > -1.0]
-        clustered_msg2d = self.define_cluster_msg(processed_2d)
+        self.processed_points_2d = np.concatenate((raw_2d, cluster_labels), axis=1)
+        self.processed_points_2d = self.processed_points_2d[self.processed_points_2d[:,3] > -1.0]
+        clustered_msg2d = self.define_cluster_msg(self.processed_points_2d)
         self.clustered_pub_2D_.publish(clustered_msg2d)
+
+    def publish_combined_clustered_map(self):
+        # combine 3D and 2D clustered points
+        self.combined_processed_points = np.concatenate((self.processed_points, self.processed_points_2d), axis=0)
+        self.combined_processed_points[:, 2] = 0.0
+        
+        clustered_msg_combined = self.define_cluster_msg(self.combined_processed_points)
+        self.combined_clustered_pub_.publish(clustered_msg_combined)
     
     def cluster_points(self, points: np.ndarray) -> np.ndarray:
         clusterer = hdbscan.HDBSCAN(min_cluster_size=self.min_cluster_size, min_samples=self.min_samples, cluster_selection_epsilon=self.cluster_selection_epsilon, alpha=self.alpha)
