@@ -7,9 +7,12 @@
   <maintainer email="danxie2001@gmail.com">Daniel Xie</maintainer>
   <license>MIT</license>
 
+  <buildtool_depend>ament_python</buildtool_depend>
+
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>sensor_msgs_py</depend>
+  <depend>orbslam3_ros2</depend>
 
   <export>
     <build_type>ament_python</build_type>

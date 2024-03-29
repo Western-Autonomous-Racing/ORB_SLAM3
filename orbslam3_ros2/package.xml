@@ -19,12 +19,9 @@
   <depend>tf2_ros</depend>
   <depend>tf2_geometry_msgs</depend>
   <depend>Pangolin</depend>
-  <depend>map_processor</depend>
-  <depend>pointcloud_to_laserscan</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
-    <build_type>ament_python</build_type>
   </export>
 
 </package>
