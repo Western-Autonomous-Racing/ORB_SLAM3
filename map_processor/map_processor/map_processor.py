@@ -57,17 +57,9 @@ class MapProcessor(Node):
 
         self.last_received_time = self.get_clock().now()
 
-        # self.clustered_pub_ = self.create_publisher(PointCloud2, "/clustered_map_points", 10)
         self.refined_pub_2D_ = self.create_publisher(PointCloud2, self.refined_map_topic_, 10)
-        # self.combined_clustered_pub_ = self.create_publisher(PointCloud2, "/combined_clustered_map", 10)
-        
-        # Create a timer that fires every second and checks if a message has been received
-        # self.timer = self.create_timer(1.0, self.check_timeout)
 
-        # self.publish_cluster_callback = self.create_timer(0.005, self.publish_clustered_map)
         self.publish_cluster_callback2d = self.create_timer(0.005, self.publish_clustered_map2d)
-        # self.publish_combined_cluster_callback = self.create_timer(0.005, self.publish_combined_clustered_map)
-
 
     def callback_raw(self, msg: PointCloud2):    
         self.raw_points_ = self.pc2_to_np_arr(msg)    
@@ -90,16 +82,6 @@ class MapProcessor(Node):
         points = points[(points[:, 2] > self.min_z_) & (points[:, 2] < self.max_z_)]
         return points
     
-    # def publish_clustered_map(self):
-    #     # cluster points initially in 3D
-    #     raw_3d = self.clip_points(self.raw_points_)
-    #     cluster_labels = self.cluster_points(raw_3d)
-    #     cluster_labels = np.float32(cluster_labels.reshape(-1, 1))
-    #     self.processed_points_ = np.concatenate((raw_3d, cluster_labels), axis=1)
-    #     self.processed_points_ = self.processed_points_[self.processed_points_[:,3] > -1.0]
-    #     clustered_msg = self.define_cluster_msg(self.processed_points_)
-    #     self.clustered_pub_.publish(clustered_msg)
-
     def publish_clustered_map2d(self):
         # cluster points initially in 2D
         if self.raw_points_.size == 0 or self.raw_points_.shape[0] == 0 or self.raw_points_.shape[1] != 3:
@@ -107,7 +89,6 @@ class MapProcessor(Node):
         
         raw_2d = self.clip_points(self.raw_points_)
         raw_2d[:, 2] = 0.0
-        # raw_2d = np.concatenate((raw_2d, np.zeros((raw_2d.shape[0], 1))), axis=1)
         
         cluster_labels = self.cluster_points(raw_2d)
         cluster_labels = np.float32(cluster_labels.reshape(-1, 1))
@@ -115,14 +96,6 @@ class MapProcessor(Node):
         self.processed_points_2d_ = self.processed_points_2d_[self.processed_points_2d_[:,3] > -1.0]
         clustered_msg2d = self.define_cluster_msg(self.processed_points_2d_)
         self.refined_pub_2D_.publish(clustered_msg2d)
-
-    # def publish_combined_clustered_map(self):
-    #     # combine 3D and 2D clustered points
-    #     self.combined_processed_points_ = np.concatenate((self.processed_points_, self.processed_points_2d_), axis=0)
-    #     self.combined_processed_points_[:, 2] = 0.0
-        
-    #     clustered_msg_combined = self.define_cluster_msg(self.combined_processed_points_)
-    #     self.combined_clustered_pub_.publish(clustered_msg_combined)
     
     def cluster_points(self, points: np.ndarray) -> np.ndarray:
         clusterer = hdbscan.HDBSCAN(min_cluster_size=self.min_cluster_size_, min_samples=self.min_samples_, cluster_selection_epsilon=self.cluster_selection_epsilon_, alpha=self.alpha_)
@@ -151,15 +124,6 @@ class MapProcessor(Node):
         point_cloud.is_dense = True
 
         return point_cloud     
-
-    def check_timeout(self):
-        # Check if the time since the last received message is greater than the timeout
-        # if (self.get_clock().now() - self.last_received_time).seconds > self.timeout:
-        pass        
-
-    def get_map_points(self) -> Tuple[np.ndarray, np.ndarray]:
-        return self.raw_points_, self.processed_points_
-
             
 def main():
     try:

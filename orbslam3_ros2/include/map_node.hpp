@@ -44,7 +44,7 @@ private:
     ORB_SLAM3::System *mpSLAM; // Pointer to the SLAM system
 
     // Cloud point maps
-    std::vector<ORB_SLAM3::MapPoint*> raw_map_points_, refined_map_points_; //raw_map 3D points, refined_map 2D points
+    std::vector<ORB_SLAM3::MapPoint*> raw_map_points_; //raw_map 3D points, refined_map 2D points
 
     // Trajectory
     std::vector<ORB_SLAM3::KeyFrame*> trajectory_;
@@ -53,7 +53,7 @@ private:
     Sophus::SE3f current_pose_, prev_pose_;
 
     // publishers
-    rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr raw_map_points_pub_, refined_map_points_pub_;
+    rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr raw_map_points_pub_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
 
     tf2_ros::TransformBroadcaster tf_broadcaster_;
@@ -62,16 +62,16 @@ private:
     thread *publishing_thread_;
 
     // subscribers to save
-    rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr raw_map_points_sub_, refined_map_points_sub_;
+    rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr raw_map_points_sub_;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
 
     string map_name_, map_dir_;
     int map_type_;
 
-    sensor_msgs::msg::PointCloud2 raw_map_points_msg_, refined_map_points_msg_;
+    sensor_msgs::msg::PointCloud2 raw_map_points_msg_;
     nav_msgs::msg::Odometry odom_msg_;
 
-    double cloud_transform_z_, upper_bound_, lower_bound_;
+    double cloud_transform_z_;
 };
 
 

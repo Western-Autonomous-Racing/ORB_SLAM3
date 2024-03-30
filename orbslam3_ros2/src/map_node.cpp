@@ -12,8 +12,6 @@ MapNode::MapNode(ORB_SLAM3::System *pSLAM, string config)
     cv::FileStorage fsSettings(config.c_str(), cv::FileStorage::READ);
 
     cv::FileNode cloud_transform_node = fsSettings["System.CloudTransformZ"];
-    cv::FileNode upper_bound_node = fsSettings["System.UpperBounds"];
-    cv::FileNode lower_bound_node = fsSettings["System.LowerBounds"];
 
     if (!cloud_transform_node.empty())
     {
@@ -24,27 +22,8 @@ MapNode::MapNode(ORB_SLAM3::System *pSLAM, string config)
         cloud_transform_z_ = 0.0;
     }
 
-    if (!upper_bound_node.empty())
-    {
-        upper_bound_ = static_cast<double>(upper_bound_node);
-    }
-    else
-    {
-        upper_bound_ = UPPER_BOUND_DEFAULT;
-    }
-
-    if (!lower_bound_node.empty())
-    {
-        lower_bound_ = static_cast<double>(lower_bound_node);
-    }
-    else
-    {
-        lower_bound_ = LOWER_BOUND_DEFAULT;
-    }
-
     raw_map_points_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>(RAW_MAP_POINT_TOPIC, 100);
     odom_pub_ = this->create_publisher<nav_msgs::msg::Odometry>(ODOM_TOPIC, 100);
-    refined_map_points_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>(REFINED_MAP_POINT_TOPIC, 100);
 
     publishing_thread_ = new thread(&MapNode::RunMapping, this);
 }
@@ -127,68 +106,8 @@ void MapNode::MapPointsPublish(rclcpp::Time frame_timestamp)
             memcpy(raw_map_points_data + i * raw_map_points_msg_.point_step, coords_array, RAW_COORDS * sizeof(float));
         }
 
-        RefinePointCloud(frame_timestamp);
-
         raw_map_points_pub_->publish(raw_map_points_msg_);
-        refined_map_points_pub_->publish(refined_map_points_msg_);
-}
-}
-
-// void RefinePointCloud();
-void MapNode::RefinePointCloud(rclcpp::Time frame_timestamp)
-{
-    // Copy the raw map points to the refined map points
-
-    refined_map_points_ = raw_map_points_;
-    ;
-    refined_map_points_msg_.header.frame_id = "odom"; // "map"
-    refined_map_points_msg_.header.stamp = frame_timestamp;
-    refined_map_points_msg_.height = 1;
-    refined_map_points_msg_.width = raw_map_points_.size();
-    refined_map_points_msg_.is_dense = true;
-    refined_map_points_msg_.is_bigendian = false;
-    refined_map_points_msg_.point_step = RAW_COORDS * sizeof(float);
-    refined_map_points_msg_.row_step = refined_map_points_msg_.point_step * refined_map_points_msg_.width;
-    refined_map_points_msg_.fields.resize(RAW_COORDS);
-
-    for (int i = 0; i < RAW_COORDS; i++)
-    {
-        refined_map_points_msg_.fields[i].name = "xyz"[i];
-        refined_map_points_msg_.fields[i].offset = i * sizeof(float);
-        refined_map_points_msg_.fields[i].datatype = sensor_msgs::msg::PointField::FLOAT32;
-        refined_map_points_msg_.fields[i].count = 1;
     }
-
-    refined_map_points_msg_.data.resize(refined_map_points_msg_.row_step * refined_map_points_msg_.height);
-    unsigned char *refined_map_points_data = &(refined_map_points_msg_.data[0]);
-    float coords_array[RAW_COORDS];
-
-    // Remove all nullptr elements from the vector
-    refined_map_points_.erase(std::remove(refined_map_points_.begin(), refined_map_points_.end(), nullptr), refined_map_points_.end());
-
-    for (int i = 0; i < refined_map_points_.size(); i++)
-    {
-        if (refined_map_points_.at(i)->isBad())
-        {
-            continue;
-        }
-
-        coords_array[0] = refined_map_points_.at(i)->GetWorldPos()(2);
-        coords_array[1] = -refined_map_points_.at(i)->GetWorldPos()(0);
-        coords_array[2] = -refined_map_points_.at(i)->GetWorldPos()(1) - (refined_map_points_.at(i)->GetWorldPos()(2) * tan(cloud_transform_z_));
-
-        // Remove the outliers
-        if (coords_array[2] < lower_bound_ || coords_array[2] > upper_bound_)
-        {
-            refined_map_points_.at(i) = nullptr;
-            continue;
-        }
-
-        memcpy(refined_map_points_data + i * refined_map_points_msg_.point_step, coords_array, RAW_COORDS * sizeof(float));
-    }
-
-    // Remove all nullptr elements from the vector
-    refined_map_points_.erase(std::remove(refined_map_points_.begin(), refined_map_points_.end(), nullptr), refined_map_points_.end());
 }
 
 void MapNode::OdomPublish(rclcpp::Time frame_timestamp, rclcpp::Time prev_timestamp)
