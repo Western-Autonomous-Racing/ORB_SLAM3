@@ -36,6 +36,6 @@ make -j4
 
 echo "Uncompress vocabulary ..."
 
-cd ../../Vocabulary
+cd ../Vocabulary
 tar -xf ORBvoc.txt.tar.gz
 cd ..
