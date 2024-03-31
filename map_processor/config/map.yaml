@@ -4,11 +4,14 @@ map_processor:
     refined_map_topic: "/refined_map_2D"
     timeout: 5
     min_z: 0.0
-    max_z: 2.2
+    max_z: 5.0
     min_cluster_size: 25
     min_samples: 3
     cluster_selection_epsilon: 0.8
     alpha: 1.0
+    enable_save: false
+    map_dir: "../output_map"
+    map_name: "aceb_baseline"
 
 pointcloud_to_laserscan_node:
   ros__parameters:

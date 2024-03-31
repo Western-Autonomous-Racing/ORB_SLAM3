@@ -79,15 +79,16 @@ ORBextractor.nLevels: 10
 # Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
 # Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
 # You can lower these values if your images have low contrast 
-ORBextractor.iniThFAST: 12 # 20
-ORBextractor.minThFAST: 3 # 7
+ORBextractor.iniThFAST: 12
+ORBextractor.minThFAST: 3
 
 #--------------------------------------------------------------------------------------------
 # Atlas Parameters
 #--------------------------------------------------------------------------------------------
 
-System.LoadAtlasFromFile: "map_aceb_second_mega"
-# System.SaveAtlasToFile: "map_aceb_baseline"
+# System.LoadAtlasFromFile: "map_aceb_second_mega"
+System.LoadAtlasFromFile: "map_aceb_baseline" 
+# System.SaveAtlasToFile: "map_cmlp_baseline" 
 # System.SaveAtlasToROS: ""
 System.CloudTransformZ: 0.0279253 # rads
 System.UpperBounds: 4.5 # metres
