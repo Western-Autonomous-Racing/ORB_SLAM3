@@ -86,9 +86,8 @@ ORBextractor.minThFAST: 3
 # Atlas Parameters
 #--------------------------------------------------------------------------------------------
 
-# System.LoadAtlasFromFile: "map_aceb_second_mega"
-System.LoadAtlasFromFile: "map_aceb_baseline" 
-# System.SaveAtlasToFile: "map_cmlp_baseline" 
+System.LoadAtlasFromFile: "map_aceb_baseline"
+# System.SaveAtlasToFile: "map_aceb_baseline"
 # System.SaveAtlasToROS: ""
 System.CloudTransformZ: 0.0279253 # rads
 System.UpperBounds: 4.5 # metres

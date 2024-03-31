@@ -67,8 +67,8 @@ def generate_launch_description():
         name='orbslam3_run',
         arguments=[
             'stereo',
-            '/home/formatspecifier/Projects/orbslam3_ws/src/ORB_SLAM3/orbslam3_ros2/ORB_SLAM3/Vocabulary/ORBvoc.txt',
-            '/home/formatspecifier/Projects/orbslam3_ws/src/ORB_SLAM3/configuration/D430.yaml',
+            '/home/war/orbslam3_ws/src/orbslam3_ros2/ORB_SLAM3/Vocabulary/ORBvoc.txt',
+            '/home/war/orbslam3_ws/src/configuration/D430.yaml',
             'false',
             'true'
         ],
