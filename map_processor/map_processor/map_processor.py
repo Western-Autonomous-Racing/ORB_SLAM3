@@ -25,10 +25,10 @@ class MapProcessor(Node):
         self.declare_parameter("cluster_selection_epsilon", 0.8)
         self.declare_parameter("alpha", 1.0)
         self.declare_parameter("enable_save", True)
-        self.declare_parameter("map_dir", "../output_map")
+        self.declare_parameter("map_dir", "output_map/")
         self.declare_parameter("map_name", "map")
         self.declare_parameter("resolution", 0.1) # metres per pixel
-        self.declare_parameter("map_padding", 1) # metres
+        self.declare_parameter("map_padding", 3) # metres
 
         if self.has_parameter("raw_map_topic"):
             self.raw_map_topic_ = self.get_parameter("raw_map_topic").value
@@ -103,35 +103,39 @@ class MapProcessor(Node):
         # create a blank image
         map_image = np.full((y_res, x_res), 255, dtype=np.uint8)
 
-    
-
         # scale points to image size
-        points[:, 0] = ((points[:, 0] - x_min) * (x_res / x_range)) + x_padding + (x_res/2)
-        points[:, 1] = ((points[:, 1] - y_min) * (y_res / y_range)) + y_padding + (y_res/2)
+        points[:, 0] = ((points[:, 0] - x_min) * (x_res / x_range)) - 1
+        points[:, 1] = ((points[:, 1] - y_min) * (y_res / y_range)) - 1
 
-        points = np.round(points).astype(np.uint8)
+        points = points.astype(int)
 
         for point in points:
             map_image[point[1], point[0]] = 0
-
-        # draw points on image
-        # print(points.shape)
-        # print(map_image)
         
-        cv2.imshow("map", map_image)
-        cv2.waitKey(0)
+        # draw points on image
+        map_image = cv2.flip(map_image, 1)
 
-        # if not os.path.exists(self.map_dir_):
-        #     os.makedirs(self.map_dir_)
+        if not os.path.exists(self.map_dir_):
+            os.makedirs(self.map_dir_)
 
-        # map_file = os.path.join(self.map_name_ + ".png")
+        map_file = os.path.join(self.map_dir_ + self.map_name_ + ".png")
 
-        # map_image = cv2.cvtColor(map_image, cv2.COLOR_GRAY2BGR)
+        ret = cv2.imwrite(map_file, map_image)
 
-        # ret = cv2.imwrite(map_file, map_image)
+        map_yaml = os.path.join(self.map_dir_ + self.map_name_ + ".yaml")  
 
-        # if not ret:
-        #     self.get_logger().error("Failed to save map")
+        with open(map_yaml, 'w') as file:
+            yaml.safe_dump({
+                "image": self.map_name_ + ".png",
+                "resolution": self.m_per_pixel_,
+                "origin": [x_min.item(), y_min.item(), 0.0],
+                "negate": 0,
+                "occupied_thresh": 0.65,
+                "free_thresh": 0.196
+            }, file, default_flow_style=None, sort_keys=False)
+
+        if not ret:
+            self.get_logger().error("Failed to save map")
 
     def callback_raw(self, msg: PointCloud2):    
         self.raw_points_ = self.pc2_to_np_arr(msg)    

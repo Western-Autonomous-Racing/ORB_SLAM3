@@ -9,8 +9,10 @@ map_processor:
     min_samples: 3
     cluster_selection_epsilon: 0.8
     alpha: 1.0
-    enable_save: false
-    map_dir: "../output_map"
+    enable_save: true
+    resolution: 0.1
+    map_padding: 3
+    map_dir: "output_map/"
     map_name: "aceb_baseline"
 
 pointcloud_to_laserscan_node:
