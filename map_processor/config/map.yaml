@@ -3,8 +3,8 @@ map_processor:
     raw_map_topic: "/raw_map_points"
     refined_map_topic: "/refined_map_2D"
     timeout: 5
-    min_z: 0.0
-    max_z: 5.0
+    min_z: 0.4
+    max_z: 2.7
     min_cluster_size: 25
     min_samples: 3
     cluster_selection_epsilon: 0.8

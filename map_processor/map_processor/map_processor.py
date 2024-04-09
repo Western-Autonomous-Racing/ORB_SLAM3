@@ -168,8 +168,6 @@ class MapProcessor(Node):
 
         if raw_2d.size == 0 or raw_2d.shape[0] <= 25 or raw_2d.shape[1] != 3:
             return
-
-        self._logger.info(f" Hello {raw_2d.shape}")
         
         cluster_labels = self.cluster_points(raw_2d)
         cluster_labels = np.float32(cluster_labels.reshape(-1, 1))

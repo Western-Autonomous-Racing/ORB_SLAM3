@@ -3,7 +3,7 @@
 
 #define RAW_MAP_POINT_TOPIC "/raw_map_points"
 #define REFINED_MAP_POINT_TOPIC "/refined_map_points"
-#define ODOM_TOPIC "/egocar/odom"
+#define ODOM_TOPIC "/odom"
 #define RAW_COORDS 3
 #define REFINED_COORDS 2
 #define UPPER_BOUND_DEFAULT 4.5
